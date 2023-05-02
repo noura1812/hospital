@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hospital/model/pationtmodel.dart';
@@ -5,6 +7,7 @@ import 'package:hospital/services/providers/signproviders.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
 import 'package:hospital/services/firebase/authentication.dart';
+import 'package:hospital/widgets/user_imagepicker.dart';
 import 'package:provider/provider.dart';
 
 class Sign extends StatefulWidget {
@@ -24,7 +27,10 @@ class _SignState extends State<Sign> {
   String _name = '';
   final _formKey = GlobalKey<FormState>();
 
-  bool isloadding = false;
+  File? _ImageFile;
+  void pickedImage(File pickedImage) {
+    _ImageFile = pickedImage;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,47 +59,47 @@ class _SignState extends State<Sign> {
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
-                  !provider.islogin
-                      ? Container(
-                          height: SizeConfig.screenHeight * .08,
-                          margin: EdgeInsets.symmetric(
-                              vertical: getProportionateScreenHeight(10)),
-                          child: TextFormField(
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(color: Themes.grey),
-                            key: const ValueKey('name'),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Pleas enter a valid Name';
-                              }
-                              return null;
-                            },
-                            onSaved: ((newValue) => _name = newValue!),
-                            keyboardType: TextInputType.text,
-                            decoration: InputDecoration(
-                              errorStyle: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(color: Themes.red, fontSize: 15),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 25.0, horizontal: 20.0),
-                              fillColor: Themes.backgroundColor,
-                              filled: true,
-                              labelText: 'Full name',
-                              labelStyle: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(color: Themes.grey, fontSize: 20),
-                              border: OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
+                  if (!provider.islogin) UserImagePicker(pickedImage),
+                  if (!provider.islogin)
+                    Container(
+                      height: SizeConfig.screenHeight * .08,
+                      margin: EdgeInsets.symmetric(
+                          vertical: getProportionateScreenHeight(10)),
+                      child: TextFormField(
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.copyWith(color: Themes.grey),
+                        key: const ValueKey('name'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Pleas enter a valid Name';
+                          }
+                          return null;
+                        },
+                        onSaved: ((newValue) => _name = newValue!),
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          errorStyle: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(color: Themes.red, fontSize: 15),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 25.0, horizontal: 20.0),
+                          fillColor: Themes.backgroundColor,
+                          filled: true,
+                          labelText: 'Full name',
+                          labelStyle: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(color: Themes.grey, fontSize: 20),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                        )
-                      : Container(),
+                        ),
+                      ),
+                    ),
                   Container(
                     height: SizeConfig.screenHeight * .08,
                     margin: EdgeInsets.symmetric(
@@ -198,7 +204,9 @@ class _SignState extends State<Sign> {
                                         PationtModel(
                                             name: _name,
                                             phone: '0$_phone',
-                                            password: _password))
+                                            password: _password,
+                                            imageurl: ''),
+                                        _ImageFile)
                                     : Authentication()
                                         .signin(context, '0$_phone', _password);
                               } else {

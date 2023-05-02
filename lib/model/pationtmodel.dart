@@ -2,10 +2,12 @@
 class PationtModel {
   String name;
   String phone;
+  String imageurl;
   String password;
   PationtModel({
     required this.name,
     required this.phone,
+    required this.imageurl,
     required this.password,
   });
 }

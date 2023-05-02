@@ -5,20 +5,21 @@ import 'package:flutter_verification_code/flutter_verification_code.dart';
 import 'package:hospital/screens/homescreen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hospital/services/providers/signproviders.dart';
-
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hospital/theme.dart';
 import 'package:provider/provider.dart';
 
 class Authentication {
   FirebaseAuth auth = FirebaseAuth.instance;
-
+  String url = '';
+  //bool smscurser = true;
 // Function to verify phone number
   Future<void> verifyPhoneNumber(
-      String phoneNumber, context, pationtdata) async {
+      String phoneNumber, context, pationtdata, imagefile) async {
     var methodprovider = Provider.of<signprividers>(context, listen: false);
 
     auth.verifyPhoneNumber(
-      timeout: const Duration(minutes: 5),
+      timeout: const Duration(seconds: 120),
       phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
         auth.signInWithCredential(credential).then((result) {
@@ -70,14 +71,25 @@ class Authentication {
                                   PhoneAuthProvider.credential(
                                       verificationId: verificationId,
                                       smsCode: smsCode))
-                              .then((v) async {
+                              .then((value) async {
+                            Provider.of<signprividers>(context, listen: false)
+                                .changesmscurser(false);
+                            print('//////////');
+                            final ref = FirebaseStorage.instance
+                                .ref()
+                                .child('user_images')
+                                .child('$phoneNumber.jpg');
+                            await ref.putFile(imagefile!);
+                            url = await ref.getDownloadURL();
+                          }).then((v) async {
                             await FirebaseFirestore.instance
                                 .collection('users')
                                 .doc(phoneNumber.substring(2))
                                 .set({
                               'username': pationtdata.name,
                               'password': pationtdata.password,
-                              'phone': pationtdata.phone
+                              'phone': pationtdata.phone,
+                              'imageurl': url
                             }).then((value) {
                               toastmessage('Signed up successfully!', false);
 
@@ -95,23 +107,38 @@ class Authentication {
                     ),
                     actions: [
                       TextButton(
-                          onPressed: () {
-                            //      callback(false);
-                            methodprovider.changeloading(false);
+                          onPressed:
+                              Provider.of<signprividers>(context).smscurser
+                                  ? () {
+                                      //      callback(false);
+                                      methodprovider.changeloading(false);
 
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            'Cancel',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall!
-                                .copyWith(color: Themes.red, fontSize: 20),
-                          ))
+                                      Navigator.pop(context);
+                                    }
+                                  : null,
+                          child: !Provider.of<signprividers>(context).smscurser
+                              ? const SizedBox(
+                                  height: 20.0,
+                                  width: 20.0,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 3.5,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Text(
+                                  'Cancel',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .copyWith(
+                                          color: Themes.red, fontSize: 20),
+                                ))
                     ]));
       },
       codeAutoRetrievalTimeout: (String verificationId) {
-        toastmessage('Sms time out try again later.', true);
+        Provider.of<signprividers>(context).smscurser
+            ? toastmessage('Sms time out try again later.', true)
+            : null;
       },
     );
   }
@@ -151,7 +178,9 @@ class Authentication {
     }
   }
 
-  chek(String phoneNumber, context, pationtdata) async {
+  chek(String phoneNumber, context, pationtdata, imagefile) async {
+    var methodprovider = Provider.of<signprividers>(context, listen: false);
+
     final userData = await FirebaseFirestore.instance
         .collection('users')
         .doc(pationtdata.phone)
@@ -159,15 +188,19 @@ class Authentication {
 
     if (userData.exists) {
       //   callback(false);
-      var methodprovider = Provider.of<signprividers>(context, listen: false);
 
       methodprovider.changeloading(false);
 
       toastmessage('already signed up try signing in!', true);
-      return true;
     } else {
-      verifyPhoneNumber(phoneNumber, context, pationtdata);
-      return false;
+      if (imagefile == null) {
+        methodprovider.changeloading(false);
+
+        toastmessage('Please add your image.', true);
+        return;
+      } else {
+        verifyPhoneNumber(phoneNumber, context, pationtdata, imagefile);
+      }
     }
   }
 
