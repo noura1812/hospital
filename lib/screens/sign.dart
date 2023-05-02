@@ -1,9 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hospital/model/pationtmodel.dart';
+import 'package:hospital/services/providers/signproviders.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
 import 'package:hospital/services/firebase/authentication.dart';
+import 'package:provider/provider.dart';
 
 class Sign extends StatefulWidget {
   static const String routname = 'sign';
@@ -15,8 +17,6 @@ class Sign extends StatefulWidget {
 }
 
 class _SignState extends State<Sign> {
-  bool _isLogin = true;
-
   String _phone = '';
 
   String _password = '';
@@ -28,6 +28,9 @@ class _SignState extends State<Sign> {
 
   @override
   Widget build(BuildContext context) {
+    var provider = Provider.of<signprividers>(context);
+    var methodprovider = Provider.of<signprividers>(context, listen: false);
+
     SizeConfig().init(context);
 
     return Scaffold(
@@ -46,11 +49,11 @@ class _SignState extends State<Sign> {
                     padding: EdgeInsets.only(
                         bottom: getProportionateScreenHeight(50)),
                     child: Text(
-                      _isLogin ? 'Sign in' : 'Sign up',
+                      provider.islogin ? 'Sign in' : 'Sign up',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
-                  !_isLogin
+                  !provider.islogin
                       ? Container(
                           height: SizeConfig.screenHeight * .08,
                           margin: EdgeInsets.symmetric(
@@ -181,26 +184,26 @@ class _SignState extends State<Sign> {
                     height: SizeConfig.screenHeight * .08,
                     margin: const EdgeInsets.only(top: 20),
                     child: ElevatedButton(
-                      onPressed: isloadding
+                      onPressed: provider.loading
                           ? null
                           : () {
-                              loadding(true);
-
+                              //  loadding(true);
+                              methodprovider.changeloading(true);
                               bool validate = _subnmit();
                               if (validate == true) {
-                                !_isLogin
+                                !provider.islogin
                                     ? Authentication().chek(
                                         '+20$_phone',
                                         context,
                                         PationtModel(
                                             name: _name,
                                             phone: '0$_phone',
-                                            password: _password),
-                                        loadding)
-                                    : Authentication().signin(context,
-                                        '0$_phone', _password, loadding);
+                                            password: _password))
+                                    : Authentication()
+                                        .signin(context, '0$_phone', _password);
                               } else {
-                                loadding(false);
+                                // loadding(false);
+                                methodprovider.changeloading(false);
                               }
                             },
                       style: ElevatedButton.styleFrom(
@@ -208,7 +211,7 @@ class _SignState extends State<Sign> {
                             borderRadius: BorderRadius.circular(20.0),
                           ),
                           backgroundColor: Theme.of(context).primaryColor),
-                      child: isloadding
+                      child: provider.loading
                           ? const SizedBox(
                               height: 20.0,
                               width: 20.0,
@@ -218,7 +221,7 @@ class _SignState extends State<Sign> {
                               ),
                             )
                           : Text(
-                              _isLogin ? 'Sign in' : "Sign up",
+                              provider.islogin ? 'Sign in' : "Sign up",
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall
@@ -229,7 +232,7 @@ class _SignState extends State<Sign> {
                     ),
                   ),
                   Container(
-                    height: !_isLogin
+                    height: !provider.islogin
                         ? SizeConfig.screenHeight * .08 +
                             SizeConfig.screenHeight * .25 -
                             getProportionateScreenHeight(150)
@@ -241,7 +244,7 @@ class _SignState extends State<Sign> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          _isLogin
+                          provider.islogin
                               ? "Don't have an account?"
                               : "Have an account?",
                           style: Theme.of(context)
@@ -254,11 +257,11 @@ class _SignState extends State<Sign> {
                         InkWell(
                           onTap: () {
                             setState(() {
-                              _isLogin = !_isLogin;
+                              provider.islogin = !provider.islogin;
                             });
                           },
                           child: Text(
-                            _isLogin ? " Sign up " : "Sign in",
+                            provider.islogin ? " Sign up " : "Sign in",
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall
@@ -294,10 +297,5 @@ class _SignState extends State<Sign> {
     } else {
       return false;
     }
-  }
-
-  loadding(bool state) {
-    isloadding = state;
-    setState(() {});
   }
 }

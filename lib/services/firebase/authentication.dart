@@ -4,15 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_verification_code/flutter_verification_code.dart';
 import 'package:hospital/screens/homescreen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hospital/services/providers/signproviders.dart';
 
 import 'package:hospital/theme.dart';
+import 'package:provider/provider.dart';
 
 class Authentication {
   FirebaseAuth auth = FirebaseAuth.instance;
 
 // Function to verify phone number
-  Future<void> verifyPhoneNumber(String phoneNumber, context, pationtdata,
-      void Function(bool) callback) async {
+  Future<void> verifyPhoneNumber(
+      String phoneNumber, context, pationtdata) async {
+    var methodprovider = Provider.of<signprividers>(context, listen: false);
+
     auth.verifyPhoneNumber(
       timeout: const Duration(minutes: 5),
       phoneNumber: phoneNumber,
@@ -22,7 +26,9 @@ class Authentication {
         }).catchError((e) {});
       },
       verificationFailed: (FirebaseAuthException e) {
-        callback(false);
+        //  callback(false);
+        methodprovider.changeloading(false);
+
         if (e.code == 'invalid-phone-number') {
           toastmessage('Invalid phone number.', true);
         } else if (e.code == 'session-expired') {
@@ -75,7 +81,9 @@ class Authentication {
                             }).then((value) {
                               toastmessage('Signed up successfully!', false);
 
-                              callback(false);
+                              //     callback(false);
+                              methodprovider.changeloading(false);
+
                               Navigator.pushReplacementNamed(
                                   context, HomeScreen.routname);
                             });
@@ -88,7 +96,8 @@ class Authentication {
                     actions: [
                       TextButton(
                           onPressed: () {
-                            callback(false);
+                            //      callback(false);
+                            methodprovider.changeloading(false);
 
                             Navigator.pop(context);
                           },
@@ -107,46 +116,57 @@ class Authentication {
     );
   }
 
-  void signin(context, String phone, String password,
-      void Function(bool) callback) async {
+  void signin(
+    context,
+    String phone,
+    String password,
+  ) async {
+    var methodprovider = Provider.of<signprividers>(context, listen: false);
+
     final userData =
         await FirebaseFirestore.instance.collection('users').doc(phone).get();
 
     if (userData.exists) {
       var data = userData;
       if (data['password'] == password) {
-        callback(false);
+        //callback(false);
+        methodprovider.changeloading(false);
+
         toastmessage('logged in successfully!', false);
 
         Navigator.pushReplacementNamed(context, HomeScreen.routname);
         //return PationtModel(
         //  name: data['username'], phone: phone, password: password);
       } else {
-        callback(false);
+        //callback(false);
+        methodprovider.changeloading(false);
 
         toastmessage('Wrong password!', true);
       }
     } else {
-      callback(false);
+      // callback(false);
+      methodprovider.changeloading(false);
 
       toastmessage('Invalid phone number try sining up!', true);
     }
   }
 
-  chek(String phoneNumber, context, pationtdata,
-      void Function(bool) callback) async {
+  chek(String phoneNumber, context, pationtdata) async {
     final userData = await FirebaseFirestore.instance
         .collection('users')
         .doc(pationtdata.phone)
         .get();
 
     if (userData.exists) {
-      callback(false);
+      //   callback(false);
+      var methodprovider = Provider.of<signprividers>(context, listen: false);
+
+      methodprovider.changeloading(false);
 
       toastmessage('already signed up try signing in!', true);
       return true;
     } else {
-      verifyPhoneNumber(phoneNumber, context, pationtdata, callback);
+      verifyPhoneNumber(phoneNumber, context, pationtdata);
       return false;
     }
   }

@@ -2,12 +2,17 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hospital/screens/homescreen.dart';
 import 'package:hospital/screens/sign.dart';
+import 'package:hospital/services/providers/signproviders.dart';
 import 'package:hospital/theme.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
   await Firebase.initializeApp();
+
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider<signprividers>(create: (_) => signprividers()),
+  ], child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
