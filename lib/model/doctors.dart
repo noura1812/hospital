@@ -8,6 +8,7 @@ class DoctorsModel {
   String about;
   String yersofexp;
   String imageurl;
+  String password;
   WorkingHoursModel workinghours;
   List<Reviewsmodel>? reviews;
   DoctorsModel({
@@ -17,6 +18,7 @@ class DoctorsModel {
     required this.about,
     required this.yersofexp,
     required this.imageurl,
+    required this.password,
     required this.workinghours,
     this.reviews,
   });

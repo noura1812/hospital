@@ -20,6 +20,7 @@ class _UserImagePickerState extends State<UserImagePicker> {
       image == null ? null : _pickedImage = File(image.path);
     });
     _pickedImage == null ? null : widget.imagePickFun(_pickedImage!);
+    Navigator.pop(context);
   }
 
   Future pickimagesgalry() async {
@@ -29,6 +30,7 @@ class _UserImagePickerState extends State<UserImagePicker> {
     });
 
     _pickedImage == null ? null : widget.imagePickFun(_pickedImage!);
+    Navigator.pop(context);
   }
 
   @override
@@ -36,18 +38,41 @@ class _UserImagePickerState extends State<UserImagePicker> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        InkWell(
-          onTap: () {
-            dialog();
-          },
-          child: CircleAvatar(
-            radius: 40,
-            backgroundColor: Colors.white,
-            backgroundImage: _pickedImage != null
-                ? FileImage(_pickedImage!)
-                : const AssetImage('assets/images/personal photo.png')
-                    as ImageProvider,
-          ),
+        Stack(
+          children: [
+            InkWell(
+              onTap: () {
+                dialog();
+              },
+              child: CircleAvatar(
+                radius: 55,
+                backgroundColor: Colors.white,
+                backgroundImage: _pickedImage != null
+                    ? FileImage(_pickedImage!)
+                    : const AssetImage('assets/images/personal photo.png')
+                        as ImageProvider,
+              ),
+            ),
+            Container(
+              height: 110,
+              width: 110,
+              alignment: Alignment.bottomRight,
+              child: InkWell(
+                onTap: () {
+                  dialog();
+                },
+                child: const CircleAvatar(
+                  radius: 18,
+                  backgroundColor: Themes.lightblue,
+                  child: Icon(
+                    Icons.camera_alt_outlined,
+                    color: Themes.lighbackgroundColor,
+                    size: 25,
+                  ),
+                ),
+              ),
+            )
+          ],
         ),
       ],
     );

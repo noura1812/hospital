@@ -14,10 +14,8 @@ class Authentication {
   String url = '';
   //bool smscurser = true;
 // Function to verify phone number
-  Future<void> verifyPhoneNumber(
-      String phoneNumber, context, pationtdata, imagefile) async {
-    var methodprovider = Provider.of<signprividers>(context, listen: false);
-
+  Future<void> verifyPhoneNumber(String phoneNumber, context, pationtdata,
+      imagefile, provider, methodprovider) async {
     auth.verifyPhoneNumber(
       timeout: const Duration(seconds: 120),
       phoneNumber: phoneNumber,
@@ -81,23 +79,52 @@ class Authentication {
                             await ref.putFile(imagefile!);
                             url = await ref.getDownloadURL();
                           }).then((v) async {
-                            await FirebaseFirestore.instance
-                                .collection('users')
-                                .doc(phoneNumber.substring(2))
-                                .set({
-                              'username': pationtdata.name,
-                              'password': pationtdata.password,
-                              'phone': pationtdata.phone,
-                              'imageurl': url
-                            }).then((value) {
-                              toastmessage('Signed up successfully!', false);
+                            if (provider.isadoctor) {
+                              await FirebaseFirestore.instance
+                                  .collection('doctors')
+                                  .doc(phoneNumber.substring(2))
+                                  .set({
+                                'username': provider.doctorsdata.name,
+                                'password': provider.doctorsdata.password,
+                                'phone': provider.doctorsdata.phoneNumber,
+                                'imageurl': url,
+                                'specialty': provider.doctorsdata.specialty,
+                                'about': provider.doctorsdata.about,
+                                'yersofexp': provider.doctorsdata.yersofexp,
+                                'statworkinghours':
+                                    provider.doctorsdata.workinghours.starthour,
+                                'endworkinghours':
+                                    provider.doctorsdata.workinghours.endhour,
+                                'workingdays': FieldValue.arrayUnion(
+                                    provider.doctorsdata.workinghours.days)
+                              }).then((value) {
+                                toastmessage('Signed up successfully!', false);
 
-                              //     callback(false);
-                              methodprovider.changeloading(false);
+                                //     callback(false);
+                                methodprovider.changeloading(false);
 
-                              Navigator.pushReplacementNamed(
-                                  context, HomeScreen.routname);
-                            });
+                                Navigator.pushReplacementNamed(
+                                    context, HomeScreen.routname);
+                              });
+                            } else {
+                              await FirebaseFirestore.instance
+                                  .collection('pationts')
+                                  .doc(phoneNumber.substring(2))
+                                  .set({
+                                'username': pationtdata.name,
+                                'password': pationtdata.password,
+                                'phone': pationtdata.phone,
+                                'imageurl': url
+                              }).then((value) {
+                                toastmessage('Signed up successfully!', false);
+
+                                //     callback(false);
+                                methodprovider.changeloading(false);
+
+                                Navigator.pushReplacementNamed(
+                                    context, HomeScreen.routname);
+                              });
+                            }
                           }).catchError((e) {});
                         },
                         autofocus: true,
@@ -135,7 +162,7 @@ class Authentication {
                     ]));
       },
       codeAutoRetrievalTimeout: (String verificationId) {
-        Provider.of<signprividers>(context).smscurser
+        provider.smscurser
             ? toastmessage('Sms time out try again later.', true)
             : null;
       },
@@ -149,11 +176,15 @@ class Authentication {
   ) async {
     var methodprovider = Provider.of<signprividers>(context, listen: false);
 
-    final userData =
-        await FirebaseFirestore.instance.collection('users').doc(phone).get();
-
-    if (userData.exists) {
-      var data = userData;
+    final doctorsdata =
+        await FirebaseFirestore.instance.collection('doctors').doc(phone).get();
+    final pationtssdata = await FirebaseFirestore.instance
+        .collection('pationts')
+        .doc(phone)
+        .get();
+//pationts
+    if (doctorsdata.exists || pationtssdata.exists) {
+      var data = doctorsdata.exists ? doctorsdata : pationtssdata;
       if (data['password'] == password) {
         //callback(false);
         methodprovider.changeloading(false);
@@ -177,15 +208,19 @@ class Authentication {
     }
   }
 
-  chek(String phoneNumber, context, pationtdata, imagefile) async {
-    var methodprovider = Provider.of<signprividers>(context, listen: false);
-
-    final userData = await FirebaseFirestore.instance
-        .collection('users')
+  chek(String phoneNumber, context, pationtdata, imagefile, provider,
+      methodprovider) async {
+    final doctorsdata = await FirebaseFirestore.instance
+        .collection('doctor')
         .doc(pationtdata.phone)
         .get();
 
-    if (userData.exists) {
+    final pationtssdata = await FirebaseFirestore.instance
+        .collection('pationts')
+        .doc(pationtdata.phone)
+        .get();
+
+    if (doctorsdata.exists || pationtssdata.exists) {
       //   callback(false);
 
       methodprovider.changeloading(false);
@@ -198,7 +233,8 @@ class Authentication {
         toastmessage('Please add your image.', true);
         return;
       } else {
-        verifyPhoneNumber(phoneNumber, context, pationtdata, imagefile);
+        verifyPhoneNumber(phoneNumber, context, pationtdata, imagefile,
+            provider, methodprovider);
       }
     }
   }

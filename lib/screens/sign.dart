@@ -7,7 +7,9 @@ import 'package:hospital/services/providers/signproviders.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
 import 'package:hospital/services/firebase/authentication.dart';
+import 'package:hospital/widgets/enterdoctorsdata.dart';
 import 'package:hospital/widgets/user_imagepicker.dart';
+import 'package:hospital/widgets/workingtime.dart';
 import 'package:provider/provider.dart';
 
 class Sign extends StatefulWidget {
@@ -20,16 +22,7 @@ class Sign extends StatefulWidget {
 }
 
 class _SignState extends State<Sign> {
-  String _phone = '';
-
-  String _password = '';
-
   String _name = '';
-  String startpm = 'PM';
-  String endpm = 'PM';
-  String _about = '';
-  String _yersofexp = '';
-  String _specialty = 'Eye';
 
   final _formKey = GlobalKey<FormState>();
   List<String> dropdownOptions = [
@@ -98,7 +91,8 @@ class _SignState extends State<Sign> {
                               }
                               return null;
                             },
-                            onSaved: ((newValue) => _name = newValue!),
+                            onSaved: ((newValue) =>
+                                methodprovider.changname(newValue!)),
                             keyboardType: TextInputType.text,
                             decoration: InputDecoration(
                               errorStyle: Theme.of(context)
@@ -137,7 +131,8 @@ class _SignState extends State<Sign> {
                             }
                             return null;
                           },
-                          onSaved: ((newValue) => _phone = newValue!),
+                          onSaved: ((newValue) =>
+                              methodprovider.changphone(newValue!)),
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
                             errorStyle: Theme.of(context)
@@ -183,7 +178,8 @@ class _SignState extends State<Sign> {
                             }
                             return null;
                           },
-                          onSaved: ((newValue) => _password = newValue!),
+                          onSaved: ((newValue) =>
+                              methodprovider.changpassword(newValue!)),
                           obscureText: true,
                           decoration: InputDecoration(
                             errorStyle: Theme.of(context)
@@ -214,279 +210,7 @@ class _SignState extends State<Sign> {
                             radiobutton('Doctor', true),
                           ],
                         ),
-                      if (provider.isadoctor)
-                        DropdownButtonFormField(
-                          decoration: InputDecoration(
-                            errorStyle: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(color: Themes.red, fontSize: 15),
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 25.0, horizontal: 20.0),
-                            fillColor: Themes.backgroundColor,
-                            filled: true,
-                            labelText: 'Chooe your specialty',
-                            labelStyle: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(color: Themes.grey, fontSize: 20),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                          value: _specialty,
-                          onSaved: (newValue) => _specialty = newValue!,
-                          onChanged: (value) {
-                            methodprovider.changspeciality(value ?? '');
-                          },
-                          items: dropdownOptions
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(
-                                value,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(
-                                        color: Themes.grey, fontSize: 20),
-                              ),
-                            );
-                          }).toList(),
-                          validator: (value) {
-                            if (value == null || value == '') {
-                              return 'Please select an option';
-                            }
-                            return null;
-                          },
-                        ),
-                      if (provider.isadoctor)
-                        Container(
-                          height: SizeConfig.screenHeight * .08,
-                          margin: EdgeInsets.symmetric(
-                              vertical: getProportionateScreenHeight(10)),
-                          child: TextFormField(
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(color: Themes.grey),
-                            key: const ValueKey('yearsofexp'),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Pleas enter a valid number';
-                              }
-                              return null;
-                            },
-                            onSaved: ((newValue) => _yersofexp = newValue!),
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              errorStyle: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(color: Themes.red, fontSize: 15),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 25.0, horizontal: 20.0),
-                              fillColor: Themes.backgroundColor,
-                              filled: true,
-                              labelText: 'Years of experiance',
-                              labelStyle: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(color: Themes.grey, fontSize: 20),
-                              border: OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                          ),
-                        ),
-                      if (provider.isadoctor)
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                height: SizeConfig.screenHeight * .08,
-                                margin: EdgeInsets.symmetric(
-                                    vertical: getProportionateScreenHeight(10)),
-                                child: TextFormField(
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.copyWith(color: Themes.grey),
-                                  key: const ValueKey('start'),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Pleas enter a valid phone number';
-                                    }
-                                    return null;
-                                  },
-                                  onSaved: ((newValue) => _phone = newValue!),
-                                  keyboardType: TextInputType.phone,
-                                  decoration: InputDecoration(
-                                    suffixIcon: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          startpm,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall
-                                              ?.copyWith(
-                                                  color: Themes.grey,
-                                                  fontSize: 14),
-                                        ),
-                                        IconButton(
-                                            icon: Icon(
-                                              Icons.arrow_drop_down,
-                                              color: Themes.grey,
-                                            ),
-                                            onPressed: null),
-                                      ],
-                                    ),
-                                    errorStyle: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall
-                                        ?.copyWith(
-                                            color: Themes.red, fontSize: 15),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 25.0, horizontal: 20.0),
-                                    fillColor: Themes.backgroundColor,
-                                    filled: true,
-                                    labelText: 'Start',
-                                    labelStyle: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall
-                                        ?.copyWith(
-                                            color: Themes.grey, fontSize: 20),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Expanded(
-                              child: Container(
-                                height: SizeConfig.screenHeight * .08,
-                                margin: EdgeInsets.symmetric(
-                                    vertical: getProportionateScreenHeight(10)),
-                                child: TextFormField(
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.copyWith(color: Themes.grey),
-                                  key: const ValueKey('End'),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Pleas enter a valid phone number';
-                                    }
-                                    return null;
-                                  },
-                                  onSaved: ((newValue) => _phone = newValue!),
-                                  keyboardType: TextInputType.phone,
-                                  decoration: InputDecoration(
-                                    suffixIcon: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          endpm,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall
-                                              ?.copyWith(
-                                                  color: Themes.grey,
-                                                  fontSize: 14),
-                                        ),
-                                        IconButton(
-                                            icon: Icon(
-                                              Icons.arrow_drop_down,
-                                              color: Themes.grey,
-                                            ),
-                                            onPressed: null),
-                                      ],
-                                    ),
-                                    errorStyle: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall
-                                        ?.copyWith(
-                                            color: Themes.red, fontSize: 15),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 25.0, horizontal: 20.0),
-                                    fillColor: Themes.backgroundColor,
-                                    filled: true,
-                                    labelText: 'End',
-                                    labelStyle: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall
-                                        ?.copyWith(
-                                            color: Themes.grey, fontSize: 20),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      if (provider.isadoctor)
-                        Container(
-                          height: SizeConfig.screenHeight * .2,
-                          margin: EdgeInsets.symmetric(
-                              vertical: getProportionateScreenHeight(10)),
-                          child: TextFormField(
-                            expands: true, // and this
-                            textAlignVertical: TextAlignVertical
-                                .top, // Align the cursor to the top
-
-                            maxLines: null, // allows any number of lines
-
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(color: Themes.grey),
-                            key: const ValueKey('about'),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Pleas enter a description';
-                              }
-                              return null;
-                            },
-                            onSaved: ((newValue) => _about = newValue!),
-                            keyboardType: TextInputType.multiline,
-                            decoration: InputDecoration(
-                              errorStyle: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(color: Themes.red, fontSize: 15),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 25.0, horizontal: 20.0),
-                              fillColor: Themes.backgroundColor,
-                              filled: true,
-                              labelText: 'About you...',
-                              alignLabelWithHint:
-                                  true, // Align the label with the hint text
-
-                              labelStyle: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
-                                    color: Themes.grey,
-                                    fontSize: 20,
-                                  ),
-                              border: OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                          ),
-                        ),
+                      if (provider.isadoctor) EnterDocsData(),
                     ]),
                   ),
                   Container(
@@ -502,21 +226,34 @@ class _SignState extends State<Sign> {
                                 ? null
                                 : () {
                                     //  loadding(true);
+                                    methodprovider.setdoctorsdata();
                                     methodprovider.changeloading(true);
                                     bool validate = _subnmit();
                                     if (validate == true) {
+                                      if (provider.days.isEmpty &&
+                                          !provider.islogin) {
+                                        Authentication().toastmessage(
+                                            'Select your working days!', true);
+                                        methodprovider.changeloading(false);
+                                        return;
+                                      }
+
                                       !provider.islogin
                                           ? Authentication().chek(
-                                              '+20$_phone',
+                                              '+20${provider.phone}',
                                               context,
                                               PationtModel(
-                                                  name: _name,
-                                                  phone: '0$_phone',
-                                                  password: _password,
+                                                  name: provider.name,
+                                                  phone: '0${provider.phone}',
+                                                  password: provider.password,
                                                   imageurl: ''),
-                                              _ImageFile)
+                                              _ImageFile,
+                                              provider,
+                                              methodprovider)
                                           : Authentication().signin(
-                                              context, '0$_phone', _password);
+                                              context,
+                                              '0${provider.phone}',
+                                              provider.password);
                                     } else {
                                       // loadding(false);
                                       methodprovider.changeloading(false);
