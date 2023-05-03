@@ -1,18 +1,23 @@
 import 'package:hospital/model/reviewmodel.dart';
+import 'package:hospital/model/workinghours.dart';
 
 class DoctorsModel {
   String name;
   String phoneNumber;
-  String field;
-  int yersofexp;
+  String specialty;
+  String about;
+  String yersofexp;
   String imageurl;
+  WorkingHoursModel workinghours;
   List<Reviewsmodel>? reviews;
   DoctorsModel({
     required this.name,
     required this.phoneNumber,
-    required this.field,
+    required this.specialty,
+    required this.about,
     required this.yersofexp,
     required this.imageurl,
+    required this.workinghours,
     this.reviews,
   });
 }

@@ -4,6 +4,7 @@ class PationtModel {
   String phone;
   String imageurl;
   String password;
+
   PationtModel({
     required this.name,
     required this.phone,

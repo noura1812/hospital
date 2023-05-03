@@ -33,39 +33,82 @@ class _UserImagePickerState extends State<UserImagePicker> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        CircleAvatar(
-          radius: 40,
-          backgroundColor: Colors.white,
-          backgroundImage: _pickedImage != null
-              ? FileImage(_pickedImage!)
-              : const AssetImage('assets/images/personal photo.png')
-                  as ImageProvider,
+        InkWell(
+          onTap: () {
+            dialog();
+          },
+          child: CircleAvatar(
+            radius: 40,
+            backgroundColor: Colors.white,
+            backgroundImage: _pickedImage != null
+                ? FileImage(_pickedImage!)
+                : const AssetImage('assets/images/personal photo.png')
+                    as ImageProvider,
+          ),
         ),
-        const SizedBox(
-          height: 10,
-        ),
-        Row(
+      ],
+    );
+  }
+
+  dialog() {
+    showDialog(
+      builder: (context) => AlertDialog(
+        content: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            IconButton(
-                onPressed: () async => pickimages(),
-                icon: const Icon(
-                  Icons.camera_alt_outlined,
-                  size: 30,
-                  color: Themes.grey,
-                )),
-            IconButton(
-                onPressed: () async => pickimagesgalry(),
-                icon: const Icon(
-                  Icons.image_outlined,
-                  size: 30,
-                  color: Themes.grey,
-                ))
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                    onPressed: () async => pickimages(),
+                    icon: const Icon(
+                      Icons.camera_alt_outlined,
+                      size: 40,
+                      color: Themes.lightblue,
+                    )),
+                const SizedBox(
+                  height: 3,
+                ),
+                Text(
+                  'Camera',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: Themes.lightblue, fontSize: 15),
+                )
+              ],
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                    onPressed: () async => pickimagesgalry(),
+                    icon: const Icon(
+                      Icons.image_outlined,
+                      size: 40,
+                      color: Themes.lightblue,
+                    )),
+                const SizedBox(
+                  height: 3,
+                ),
+                Text(
+                  'Gallery',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: Themes.lightblue, fontSize: 15),
+                )
+              ],
+            )
           ],
-        )
-      ],
+        ),
+      ),
+      context: context,
     );
   }
 }

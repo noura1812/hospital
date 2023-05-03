@@ -74,7 +74,6 @@ class Authentication {
                               .then((value) async {
                             Provider.of<signprividers>(context, listen: false)
                                 .changesmscurser(false);
-                            print('//////////');
                             final ref = FirebaseStorage.instance
                                 .ref()
                                 .child('user_images')
