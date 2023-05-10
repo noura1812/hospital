@@ -203,7 +203,7 @@ class _SignState extends State<Sign> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            radiobutton('Pationt', false),
+                            radiobutton('Patient', false),
                             radiobutton('Doctor', true),
                           ],
                         ),

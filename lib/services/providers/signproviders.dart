@@ -22,7 +22,7 @@ class signprividers with ChangeNotifier {
       imageurl: '',
       workinghours: WorkingHoursModel(starthour: '', endhour: '', days: []));
 
-  String specialty = 'Ophthalmology';
+  String specialty = 'Ophthalmologist';
   List days = [];
   String about = '';
   String yersofexp = '';

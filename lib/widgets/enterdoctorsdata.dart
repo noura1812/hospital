@@ -7,10 +7,10 @@ import 'package:provider/provider.dart';
 
 class EnterDocsData extends StatelessWidget {
   List<String> dropdownOptions = [
-    'Ophthalmology',
-    'Otolaryngology',
-    'Cardiology',
-    'Dermatology',
+    'Ophthalmologist',
+    'Otolaryngologist',
+    'Cardiologist',
+    'Dermatologist',
     'Dentist',
   ];
 
@@ -30,7 +30,7 @@ class EnterDocsData extends StatelessWidget {
               const EdgeInsets.symmetric(vertical: 25.0, horizontal: 20.0),
           fillColor: Themes.backgroundColor,
           filled: true,
-          labelText: 'Chooe your specialty',
+          labelText: 'Choose your specialty',
           labelStyle: Theme.of(context)
               .textTheme
               .bodySmall

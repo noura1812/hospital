@@ -16,15 +16,6 @@ class HomeTab extends StatefulWidget {
 class _HomeTabState extends State<HomeTab> {
   TextEditingController searchController = TextEditingController();
   bool _isloading = true;
-  @override
-  void initState() {
-    Provider.of<GetDoctorsData>(context, listen: false).getData().then((value) {
-      setState(() {
-        _isloading = false;
-      });
-    });
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +55,7 @@ class _HomeTabState extends State<HomeTab> {
           )
         ],
       ),
-      body: _isloading
+      body: doctors.isEmpty
           ? const Center(
               child: CircularProgressIndicator(),
             )

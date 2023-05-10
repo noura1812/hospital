@@ -36,11 +36,12 @@ class DoctorsLongCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                doctorsModel.name,
+                doctorsModel.name.substring(0, 1).toUpperCase() +
+                    doctorsModel.name.substring(1),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               const SizedBox(
-                height: 5,
+                height: 8,
               ),
               Row(
                 children: [
