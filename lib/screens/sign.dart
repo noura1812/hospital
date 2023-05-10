@@ -9,7 +9,6 @@ import 'package:hospital/theme.dart';
 import 'package:hospital/services/firebase/authentication.dart';
 import 'package:hospital/widgets/enterdoctorsdata.dart';
 import 'package:hospital/widgets/user_imagepicker.dart';
-import 'package:hospital/widgets/workingtime.dart';
 import 'package:provider/provider.dart';
 
 class Sign extends StatefulWidget {
@@ -22,8 +21,6 @@ class Sign extends StatefulWidget {
 }
 
 class _SignState extends State<Sign> {
-  String _name = '';
-
   final _formKey = GlobalKey<FormState>();
   List<String> dropdownOptions = [
     'Eye',
@@ -34,9 +31,9 @@ class _SignState extends State<Sign> {
     'Teeth'
   ];
 
-  File? _ImageFile;
+  File? imageFile;
   void pickedImage(File pickedImage) {
-    _ImageFile = pickedImage;
+    imageFile = pickedImage;
   }
 
   @override
@@ -210,7 +207,8 @@ class _SignState extends State<Sign> {
                             radiobutton('Doctor', true),
                           ],
                         ),
-                      if (provider.isadoctor) EnterDocsData(),
+                      if (provider.isadoctor && !provider.islogin)
+                        EnterDocsData(),
                     ]),
                   ),
                   Container(
@@ -247,7 +245,7 @@ class _SignState extends State<Sign> {
                                                   phone: '0${provider.phone}',
                                                   password: provider.password,
                                                   imageurl: ''),
-                                              _ImageFile,
+                                              imageFile,
                                               provider,
                                               methodprovider)
                                           : Authentication().signin(

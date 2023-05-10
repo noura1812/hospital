@@ -22,7 +22,7 @@ class signprividers with ChangeNotifier {
       imageurl: '',
       workinghours: WorkingHoursModel(starthour: '', endhour: '', days: []));
 
-  String specialty = 'Eye';
+  String specialty = 'Ophthalmology';
   List days = [];
   String about = '';
   String yersofexp = '';
@@ -56,6 +56,30 @@ class signprividers with ChangeNotifier {
             endhour: '$endtime $endpm',
             days: days));
     notifyListeners();
+  }
+
+  getdoctorsdata(DoctorsModel doctorsModel) {
+    doctorsdata = DoctorsModel(
+        name: doctorsModel.name,
+        password: doctorsModel.password,
+        phoneNumber: doctorsModel.phoneNumber,
+        specialty: doctorsModel.specialty,
+        about: doctorsModel.about,
+        yersofexp: doctorsModel.yersofexp,
+        imageurl: doctorsModel.imageurl,
+        workinghours: WorkingHoursModel(
+            starthour: doctorsModel.workinghours.starthour,
+            endhour: doctorsModel.workinghours.endhour,
+            days: doctorsModel.workinghours.days));
+    notifyListeners();
+  }
+
+  getPationtsData(PationtModel pationtModel) {
+    pationtdata = PationtModel(
+        name: pationtModel.name,
+        phone: pationtModel.phone,
+        imageurl: pationtModel.imageurl,
+        password: pationtModel.password);
   }
 
   setdayvalue(value) {

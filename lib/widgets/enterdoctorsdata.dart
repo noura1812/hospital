@@ -7,12 +7,11 @@ import 'package:provider/provider.dart';
 
 class EnterDocsData extends StatelessWidget {
   List<String> dropdownOptions = [
-    'Eye',
-    'Nose',
-    'Heart',
-    'Ear',
-    'Skin',
-    'Teeth'
+    'Ophthalmology',
+    'Otolaryngology',
+    'Cardiology',
+    'Dermatology',
+    'Dentist',
   ];
 
   @override

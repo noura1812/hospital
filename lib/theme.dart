@@ -52,6 +52,5 @@ class Themes {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        centerTitle: true,
       ));
 }

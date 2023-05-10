@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_verification_code/flutter_verification_code.dart';
+import 'package:hospital/model/doctors.dart';
+import 'package:hospital/model/pationtmodel.dart';
+import 'package:hospital/model/workinghours.dart';
 import 'package:hospital/screens/homescreen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hospital/services/providers/signproviders.dart';
@@ -189,6 +192,31 @@ class Authentication {
         //callback(false);
         methodprovider.changeloading(false);
 
+        if (doctorsdata.exists) {
+          DoctorsModel doctorsModel = DoctorsModel(
+              name: data['username'],
+              phoneNumber: data['phone'],
+              specialty: data['specialty'],
+              about: data['about'],
+              yersofexp: data['yersofexp'],
+              imageurl: data['imageurl'],
+              password: data['password'],
+              workinghours: WorkingHoursModel(
+                  starthour: data['statworkinghours'],
+                  endhour: data['endworkinghours'],
+                  days: data['workingdays']));
+          methodprovider.changeisadoctor(true);
+          methodprovider.getdoctorsdata(doctorsModel);
+        } else {
+          PationtModel pationtModel = PationtModel(
+            name: data['username'],
+            phone: data['phone'],
+            imageurl: data['imageurl'],
+            password: data['password'],
+          );
+          methodprovider.changeisadoctor(false);
+          methodprovider.getPationtsData(pationtModel);
+        }
         toastmessage('logged in successfully!', false);
 
         Navigator.pushReplacementNamed(context, HomeScreen.routname);
