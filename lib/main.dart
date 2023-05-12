@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hospital/screens/homescreen.dart';
 import 'package:hospital/screens/sign.dart';
+import 'package:hospital/screens/smsVirefecatiom.dart';
 import 'package:hospital/services/firebase/getDoctorsData.dart';
 import 'package:hospital/services/providers/hometabProviders.dart';
 import 'package:hospital/services/providers/signproviders.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
       routes: {
         Sign.routname: (context) => const Sign(),
         HomeScreen.routname: (context) => HomeScreen(),
+        SmsVerification.routname: (context) => SmsVerification(),
       },
       theme: Themes.lightTheme,
     );

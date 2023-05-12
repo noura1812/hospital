@@ -28,7 +28,8 @@ class Workingtime extends StatelessWidget {
           margin:
               EdgeInsets.symmetric(vertical: getProportionateScreenHeight(10)),
           padding: EdgeInsets.symmetric(
-              horizontal: getProportionateScreenHeight(10)),
+              horizontal: getProportionateScreenHeight(10),
+              vertical: getProportionateScreenHeight(10)),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             border: Border.all(

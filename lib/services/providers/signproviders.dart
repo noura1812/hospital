@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:hospital/model/doctors.dart';
 import 'package:hospital/model/pationtmodel.dart';
@@ -8,19 +10,10 @@ class signprividers with ChangeNotifier {
   bool islogin = true;
   bool smscurser = true;
   bool isadoctor = false;
-
+  String verificationId = '';
+  File? imageFile;
   PationtModel pationtdata =
       PationtModel(name: '', phone: '', imageurl: '', password: '');
-
-  DoctorsModel doctorsdata = DoctorsModel(
-      password: '',
-      name: '',
-      phoneNumber: '',
-      specialty: '',
-      about: '',
-      yersofexp: '',
-      imageurl: '',
-      workinghours: WorkingHoursModel(starthour: '', endhour: '', days: []));
 
   String specialty = 'Ophthalmologist';
   List days = [];
@@ -36,6 +29,26 @@ class signprividers with ChangeNotifier {
   String password = '';
   String imageurl = '';
   String phone = '';
+
+  void pickedImage(File pickedImage) {
+    imageFile = pickedImage;
+    notifyListeners();
+  }
+
+  changeVerificationId(String value) {
+    verificationId = value;
+    notifyListeners();
+  }
+
+  DoctorsModel doctorsdata = DoctorsModel(
+      password: '',
+      name: '',
+      phoneNumber: '',
+      specialty: '',
+      about: '',
+      yersofexp: '',
+      imageurl: '',
+      workinghours: WorkingHoursModel(starthour: '', endhour: '', days: []));
 
   changeloading(bool value) {
     loading = value;
@@ -55,6 +68,12 @@ class signprividers with ChangeNotifier {
             starthour: '$starttime $startpm',
             endhour: '$endtime $endpm',
             days: days));
+    notifyListeners();
+  }
+
+  setpatentsdata() {
+    pationtdata = PationtModel(
+        name: name, phone: phone, imageurl: imageurl, password: password);
     notifyListeners();
   }
 
@@ -93,7 +112,7 @@ class signprividers with ChangeNotifier {
   }
 
   changphone(String value) {
-    phone = value;
+    phone = '0$value';
     notifyListeners();
   }
 

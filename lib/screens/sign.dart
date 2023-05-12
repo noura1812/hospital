@@ -69,7 +69,8 @@ class _SignState extends State<Sign> {
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                       ),
-                      if (!provider.islogin) UserImagePicker(pickedImage),
+                      if (!provider.islogin)
+                        UserImagePicker(methodprovider.pickedImage),
                       if (!provider.islogin)
                         Container(
                           height: SizeConfig.screenHeight * .08,
@@ -224,12 +225,14 @@ class _SignState extends State<Sign> {
                                 ? null
                                 : () {
                                     //  loadding(true);
-                                    methodprovider.setdoctorsdata();
+
                                     methodprovider.changeloading(true);
                                     bool validate = _subnmit();
                                     if (validate == true) {
+                                      methodprovider.setdoctorsdata();
                                       if (provider.days.isEmpty &&
-                                          !provider.islogin) {
+                                          !provider.islogin &&
+                                          provider.isadoctor) {
                                         Authentication().toastmessage(
                                             'Select your working days!', true);
                                         methodprovider.changeloading(false);
@@ -238,19 +241,10 @@ class _SignState extends State<Sign> {
 
                                       !provider.islogin
                                           ? Authentication().chek(
-                                              '+20${provider.phone}',
-                                              context,
-                                              PationtModel(
-                                                  name: provider.name,
-                                                  phone: '0${provider.phone}',
-                                                  password: provider.password,
-                                                  imageurl: ''),
-                                              imageFile,
-                                              provider,
-                                              methodprovider)
+                                              context, provider, methodprovider)
                                           : Authentication().signin(
                                               context,
-                                              '0${provider.phone}',
+                                              provider.phone,
                                               provider.password);
                                     } else {
                                       // loadding(false);

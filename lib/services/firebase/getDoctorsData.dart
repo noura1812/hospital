@@ -6,10 +6,11 @@ import 'package:hospital/model/workinghours.dart';
 class GetDoctorsData with ChangeNotifier {
   List<DoctorsModel> doctors = [];
   getData() async {
-    doctors = [];
+    List<DoctorsModel> newdoctors = [];
     await FirebaseFirestore.instance.collection('doctors').get().then((value) {
+      print('/////////');
       value.docs.forEach((data) {
-        doctors.add(DoctorsModel(
+        newdoctors.add(DoctorsModel(
             name: data['username'],
             phoneNumber: data['phone'],
             specialty: data['specialty'],
@@ -23,6 +24,10 @@ class GetDoctorsData with ChangeNotifier {
                 days: data['workingdays'])));
       });
     });
+    print(newdoctors.length);
+
+    doctors = newdoctors;
     notifyListeners();
+    print(doctors.length);
   }
 }

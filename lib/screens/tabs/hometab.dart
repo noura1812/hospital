@@ -26,8 +26,10 @@ class _HomeTabState extends State<HomeTab> {
     var getDoctorsData = Provider.of<GetDoctorsData>(context);
     List doctors = getDoctorsData.doctors;
     bool isadoctor = signInProvider.isadoctor;
+
     var userdata =
         isadoctor ? signInProvider.doctorsdata : signInProvider.pationtdata;
+
     return Scaffold(
       backgroundColor: Themes.backgroundColor,
       appBar: AppBar(
@@ -55,104 +57,99 @@ class _HomeTabState extends State<HomeTab> {
           )
         ],
       ),
-      body: doctors.isEmpty
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : Padding(
-              padding: EdgeInsets.all(getProportionateScreenWidth(15)),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(
-                          top: getProportionateScreenWidth(10),
-                          bottom: getProportionateScreenWidth(30)),
-                      width: double.infinity,
-                      child: Column(children: [
-                        Text(
-                          'Find',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        Text(
-                          'Your Doctor',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ]),
+      body: Padding(
+        padding: EdgeInsets.all(getProportionateScreenWidth(15)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          Container(
+            margin: EdgeInsets.only(
+                top: getProportionateScreenWidth(10),
+                bottom: getProportionateScreenWidth(30)),
+            width: double.infinity,
+            child: Column(children: [
+              Text(
+                'Find',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Text(
+                'Your Doctor',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ]),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(
+                horizontal: getProportionateScreenWidth(30)),
+            child: TextFormField(
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Themes.grey, decoration: TextDecoration.none),
+              controller: searchController,
+              keyboardType: TextInputType.text,
+              decoration: InputDecoration(
+                  prefixIconColor: Themes.grey,
+                  prefixIconConstraints: const BoxConstraints(
+                    minWidth: 0,
+                    minHeight: 0,
+                  ),
+                  prefixIcon: const Padding(
+                    padding:
+                        EdgeInsets.only(top: 5, bottom: 5, right: 7, left: 12),
+                    child: Icon(
+                      Icons.search,
+                      size: 20,
                     ),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: getProportionateScreenWidth(30)),
-                      child: TextFormField(
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Themes.grey,
-                            decoration: TextDecoration.none),
-                        controller: searchController,
-                        keyboardType: TextInputType.text,
-                        decoration: InputDecoration(
-                            prefixIconColor: Themes.grey,
-                            prefixIconConstraints: const BoxConstraints(
-                              minWidth: 0,
-                              minHeight: 0,
-                            ),
-                            prefixIcon: const Padding(
-                              padding: EdgeInsets.only(
-                                  top: 5, bottom: 5, right: 7, left: 12),
-                              child: Icon(
-                                Icons.search,
-                                size: 20,
-                              ),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 15.0),
-                            filled: true,
-                            fillColor: Themes.lighbackgroundColor,
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            hintText: 'Search doctors',
-                            hintStyle: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(color: Themes.grey, fontSize: 15)),
-                      ),
-                    ),
-                    Container(
-                      height: SizeConfig.screenHeight * .13,
-                      padding: EdgeInsets.symmetric(
-                          vertical: getProportionateScreenWidth(20)),
-                      child: Row(
-                        children: [
-                          ...homeTabProvider.fields.map((e) {
-                            return fieldCard(e, context);
-                          }).toList()
-                        ],
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          'Top Doctors',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                        const Spacer(),
-                        Text(
-                          'See all',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        )
-                      ],
-                    ),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: doctors.length,
-                        itemBuilder: (context, index) {
-                          return DoctorsLongCard(doctorsModel: doctors[index]);
-                        },
-                      ),
-                    )
-                  ]),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 10.0, horizontal: 15.0),
+                  filled: true,
+                  fillColor: Themes.lighbackgroundColor,
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  hintText: 'Search doctors',
+                  hintStyle: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: Themes.grey, fontSize: 15)),
             ),
+          ),
+          Container(
+            height: SizeConfig.screenHeight * .13,
+            padding:
+                EdgeInsets.symmetric(vertical: getProportionateScreenWidth(20)),
+            child: Row(
+              children: [
+                ...homeTabProvider.fields.map((e) {
+                  return fieldCard(e, context);
+                }).toList()
+              ],
+            ),
+          ),
+          Row(
+            children: [
+              Text(
+                'Top Doctors',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              const Spacer(),
+              Text(
+                'See all',
+                style: Theme.of(context).textTheme.bodySmall,
+              )
+            ],
+          ),
+          !doctors.isEmpty
+              ? Expanded(
+                  child: ListView.builder(
+                    itemCount: doctors.length,
+                    itemBuilder: (context, index) {
+                      return DoctorsLongCard(doctorsModel: doctors[index]);
+                    },
+                  ),
+                )
+              : Container()
+        ]),
+      ),
     );
   }
 
