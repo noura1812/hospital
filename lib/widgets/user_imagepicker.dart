@@ -20,7 +20,7 @@ class _UserImagePickerState extends State<UserImagePicker> {
       image == null ? null : _pickedImage = File(image.path);
     });
     _pickedImage == null ? null : widget.imagePickFun(_pickedImage!);
-    Navigator.pop(context);
+    _pickedImage == null ? null : Navigator.pop(context);
   }
 
   Future pickimagesgalry() async {
@@ -30,7 +30,7 @@ class _UserImagePickerState extends State<UserImagePicker> {
     });
 
     _pickedImage == null ? null : widget.imagePickFun(_pickedImage!);
-    Navigator.pop(context);
+    _pickedImage == null ? null : Navigator.pop(context);
   }
 
   @override

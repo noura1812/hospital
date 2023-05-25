@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hospital/services/providers/signproviders.dart';
+import 'package:hospital/providers/signproviders.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
 import 'package:provider/provider.dart';
@@ -152,7 +152,6 @@ class Workingtime extends StatelessWidget {
                     right: getProportionateScreenHeight(5)),
                 child: InkWell(
                     onTap: () {
-                      print(provider.days);
                       return _showMultiSelect(context);
                     },
                     child: Text(

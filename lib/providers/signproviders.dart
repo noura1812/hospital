@@ -8,12 +8,14 @@ import 'package:hospital/model/workinghours.dart';
 class signprividers with ChangeNotifier {
   bool loading = false;
   bool islogin = true;
-  bool smscurser = true;
+  bool verified = false;
   bool isadoctor = false;
+  bool verefing = false;
+
+  int countDown = 70;
   String verificationId = '';
   File? imageFile;
-  PationtModel pationtdata =
-      PationtModel(name: '', phone: '', imageurl: '', password: '');
+  PationtModel pationtdata = PationtModel(name: '', phone: '', imageurl: '');
 
   String specialty = 'Ophthalmologist';
   List days = [];
@@ -26,7 +28,6 @@ class signprividers with ChangeNotifier {
   String endtime = '';
 
   String name = '';
-  String password = '';
   String imageurl = '';
   String phone = '';
 
@@ -40,14 +41,24 @@ class signprividers with ChangeNotifier {
     notifyListeners();
   }
 
+  changeCounDown() {
+    countDown = countDown - 1;
+    notifyListeners();
+  }
+
+  resetCounDown() {
+    countDown = 70;
+    notifyListeners();
+  }
+
   DoctorsModel doctorsdata = DoctorsModel(
-      password: '',
       name: '',
       phoneNumber: '',
       specialty: '',
       about: '',
       yersofexp: '',
       imageurl: '',
+      reviews: [],
       workinghours: WorkingHoursModel(starthour: '', endhour: '', days: []));
 
   changeloading(bool value) {
@@ -55,10 +66,15 @@ class signprividers with ChangeNotifier {
     notifyListeners();
   }
 
+  changverifing(bool value) {
+    verefing = value;
+    notifyListeners();
+  }
+
   setdoctorsdata() {
     doctorsdata = DoctorsModel(
+        reviews: [],
         name: name,
-        password: password,
         phoneNumber: phone,
         specialty: specialty,
         about: about,
@@ -72,15 +88,14 @@ class signprividers with ChangeNotifier {
   }
 
   setpatentsdata() {
-    pationtdata = PationtModel(
-        name: name, phone: phone, imageurl: imageurl, password: password);
+    pationtdata = PationtModel(name: name, phone: phone, imageurl: imageurl);
     notifyListeners();
   }
 
   getdoctorsdata(DoctorsModel doctorsModel) {
     doctorsdata = DoctorsModel(
+        reviews: [],
         name: doctorsModel.name,
-        password: doctorsModel.password,
         phoneNumber: doctorsModel.phoneNumber,
         specialty: doctorsModel.specialty,
         about: doctorsModel.about,
@@ -93,12 +108,21 @@ class signprividers with ChangeNotifier {
     notifyListeners();
   }
 
+  setDoctorsUrl(String url) {
+    doctorsdata.imageurl = url;
+    notifyListeners();
+  }
+
+  setPAtiontssUrl(String url) {
+    imageurl = url;
+    notifyListeners();
+  }
+
   getPationtsData(PationtModel pationtModel) {
     pationtdata = PationtModel(
         name: pationtModel.name,
         phone: pationtModel.phone,
-        imageurl: pationtModel.imageurl,
-        password: pationtModel.password);
+        imageurl: pationtModel.imageurl);
   }
 
   setdayvalue(value) {
@@ -118,11 +142,6 @@ class signprividers with ChangeNotifier {
 
   changname(String value) {
     name = value;
-    notifyListeners();
-  }
-
-  changpassword(String value) {
-    password = value;
     notifyListeners();
   }
 
@@ -166,8 +185,8 @@ class signprividers with ChangeNotifier {
     notifyListeners();
   }
 
-  changesmscurser(bool value) {
-    smscurser = value;
+  changeverified(bool value) {
+    verified = value;
     notifyListeners();
   }
 

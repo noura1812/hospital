@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 
 import 'package:hospital/model/doctors.dart';
@@ -8,13 +7,14 @@ import 'package:hospital/theme.dart';
 class DoctorsLongCard extends StatelessWidget {
   DoctorsModel doctorsModel;
   DoctorsLongCard({
+    super.key,
     required this.doctorsModel,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: getProportionateScreenWidth(15)),
+      margin: EdgeInsets.symmetric(vertical: getProportionateScreenWidth(7)),
       padding: EdgeInsets.all(getProportionateScreenWidth(15)),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -50,10 +50,10 @@ class DoctorsLongCard extends StatelessWidget {
                     style: Theme.of(context)
                         .textTheme
                         .bodySmall!
-                        .copyWith(color: Themes.grey, fontSize: 15),
+                        .copyWith(color: Themes.grey, fontSize: 13),
                   ),
                   Text(
-                    '(${doctorsModel.reviews == null ? '0' : doctorsModel.reviews!.length} reviews)',
+                    '(${doctorsModel.reviews.length} reviews)',
                     style: Theme.of(context)
                         .textTheme
                         .bodySmall!
@@ -63,8 +63,8 @@ class DoctorsLongCard extends StatelessWidget {
               ),
             ],
           ),
-          Spacer(),
-          Icon(
+          const Spacer(),
+          const Icon(
             Icons.star,
             color: Colors.yellow,
           )

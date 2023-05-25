@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:hospital/services/providers/signproviders.dart';
+import 'package:hospital/providers/signproviders.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
 import 'package:hospital/widgets/workingtime.dart';
 import 'package:provider/provider.dart';
 
 class EnterDocsData extends StatelessWidget {
-  List<String> dropdownOptions = [
+  final List<String> dropdownOptions = [
     'Ophthalmologist',
     'Otolaryngologist',
     'Cardiologist',
     'Dermatologist',
     'Dentist',
   ];
+
+  EnterDocsData({super.key});
 
   @override
   Widget build(BuildContext context) {

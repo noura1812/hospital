@@ -1,29 +1,20 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:hospital/model/doctors.dart';
 import 'package:hospital/model/pationtmodel.dart';
-import 'package:hospital/model/workinghours.dart';
-import 'package:hospital/screens/homescreen.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:hospital/screens/smsVirefecatiom.dart';
-import 'package:hospital/services/providers/signproviders.dart';
-import 'package:hospital/theme.dart';
-import 'package:provider/provider.dart';
+import 'package:hospital/providers/signproviders.dart';
+import 'package:hospital/services/firebase/firebase_main_functions.dart';
+import 'package:hospital/widgets/toast.dart';
 
 class Authentication {
-  FirebaseAuth auth = FirebaseAuth.instance;
-  String url = '';
-  //bool smscurser = true;
-// Function to verify phone number
-  Future<void> verifyPhoneNumber(context, provider, methodprovider,
-      {bool resend = false}) async {
+  static Future<void> verifyPhoneNumber(
+      provider, methodprovider, Function goHome) async {
+    FirebaseAuth auth = FirebaseAuth.instance;
     auth.verifyPhoneNumber(
       timeout: const Duration(seconds: 60),
       phoneNumber: '+2${provider.phone}',
       verificationCompleted: (PhoneAuthCredential credential) async {
         auth.signInWithCredential(credential).then((result) {
-          Navigator.pushReplacementNamed(context, HomeScreen.routname);
+          goHome();
         }).catchError((e) {});
       },
       verificationFailed: (FirebaseAuthException e) {
@@ -31,123 +22,88 @@ class Authentication {
         methodprovider.changeloading(false);
 
         if (e.code == 'invalid-phone-number') {
-          toastmessage('Invalid phone number.', true);
+          ToastMessage.toastmessage('Invalid phone number.', true);
         } else if (e.code == 'session-expired') {
-          toastmessage('try again later.', true);
+          ToastMessage.toastmessage('try again later.', true);
         } else if (e.code == 'code-expired') {
-          toastmessage('Code expired try again later.', true);
+          ToastMessage.toastmessage('Code expired try again later.', true);
         } else if (e.code == 'invalid-verification-code') {
-          toastmessage('Invalid verification code.', true);
+          ToastMessage.toastmessage('Invalid verification code.', true);
         } else {
-          toastmessage('There was an arror try again later.', true);
+          ToastMessage.toastmessage(
+              'There was an arror try again later.', true);
         }
       },
       codeSent: (String verificationId, [int? forceResendingToken]) {
         methodprovider.changeVerificationId(verificationId);
-
-        resend ? null : Navigator.pushNamed(context, SmsVerification.routname);
       },
       codeAutoRetrievalTimeout: (String verificationId) {},
     );
   }
 
   void signin(
-    context,
-    String phone,
-    String password,
-  ) async {
-    var methodprovider = Provider.of<signprividers>(context, listen: false);
-
+      methodprovider, provider, homeTabProviderMethods, Function goHome) async {
     final doctorsdata =
-        await FirebaseFirestore.instance.collection('doctors').doc(phone).get();
-    final pationtssdata = await FirebaseFirestore.instance
-        .collection('pationts')
-        .doc(phone)
-        .get();
-//
+        await FirebaseMainFunctions.searchForADoctors(provider.phone);
+    final pationtssdata =
+        await FirebaseMainFunctions.searchForAPationt(provider.phone);
+//send sms
 
-    if (doctorsdata.exists || pationtssdata.exists) {
-      var data = doctorsdata.exists ? doctorsdata : pationtssdata;
-      if (data['password'] == password) {
-        methodprovider.changeloading(false);
+    if (doctorsdata.docs.isNotEmpty || pationtssdata.docs.isNotEmpty) {
+      methodprovider.changeloading(false);
 
-        if (doctorsdata.exists) {
-          DoctorsModel doctorsModel = DoctorsModel(
-              name: data['username'],
-              phoneNumber: data['phone'],
-              specialty: data['specialty'],
-              about: data['about'],
-              yersofexp: data['yersofexp'],
-              imageurl: data['imageurl'],
-              password: data['password'],
-              workinghours: WorkingHoursModel(
-                  starthour: data['statworkinghours'],
-                  endhour: data['endworkinghours'],
-                  days: data['workingdays']));
-          methodprovider.changeisadoctor(true);
-          methodprovider.getdoctorsdata(doctorsModel);
-        } else {
-          PationtModel pationtModel = PationtModel(
-            name: data['username'],
-            phone: data['phone'],
-            imageurl: data['imageurl'],
-            password: data['password'],
-          );
-          methodprovider.changeisadoctor(false);
-          methodprovider.getPationtsData(pationtModel);
-        }
-        toastmessage('logged in successfully!', false);
-
-        Navigator.pushReplacementNamed(context, HomeScreen.routname);
+      if (doctorsdata.docs.isNotEmpty) {
+        DoctorsModel doctorsModel = doctorsdata.docs[0].data();
+        methodprovider.changeisadoctor(true);
+        methodprovider.getdoctorsdata(doctorsModel);
       } else {
-        methodprovider.changeloading(false);
-
-        toastmessage('Wrong password!', true);
+        PationtModel pationtModel = pationtssdata.docs[0].data();
+        methodprovider.changeisadoctor(false);
+        methodprovider.getPationtsData(pationtModel);
       }
+
+      ToastMessage.toastmessage('logged in successfully!', false);
+
+      homeTabProviderMethods.setUserData(
+          provider.isadoctor ? provider.doctorsdata : provider.pationtdata);
+
+      goHome();
     } else {
       methodprovider.changeloading(false);
 
-      toastmessage('Invalid phone number try sining up!', true);
+      ToastMessage.toastmessage('Invalid phone number!', true);
     }
   }
 
-  chek(context, provider, methodprovider) async {
-    final doctorsdata = await FirebaseFirestore.instance
-        .collection('doctor')
-        .doc(provider.phone)
-        .get();
+  static Future<bool> chek(signprividers provider, methodprovider) async {
+    final doctorsdata =
+        await FirebaseMainFunctions.searchForADoctors(provider.phone);
 
-    final pationtssdata = await FirebaseFirestore.instance
-        .collection('pationts')
-        .doc(provider.phone)
-        .get();
-
-    if (doctorsdata.exists || pationtssdata.exists) {
-      //   callback(false);
-
+    final pationtssdata =
+        await FirebaseMainFunctions.searchForAPationt(provider.phone);
+    if (doctorsdata.docs.isNotEmpty || pationtssdata.docs.isNotEmpty) {
       methodprovider.changeloading(false);
 
-      toastmessage('already signed up try signing in!', true);
+      provider.islogin
+          ? null
+          : ToastMessage.toastmessage(
+              'already signed up try signing in!', true);
+      return false;
     } else {
-      if (provider.imageurl == null) {
+      if (provider.islogin) {
+        ToastMessage.toastmessage('Invaled Phone Number!', true);
         methodprovider.changeloading(false);
 
-        toastmessage('Please add your image.', true);
-        return;
+        return true;
+      }
+      if (provider.imageFile == null) {
+        methodprovider.changeloading(false);
+
+        ToastMessage.toastmessage('Please add your image.', true);
+        return false;
       } else {
-        verifyPhoneNumber(context, provider, methodprovider);
+        return true;
       }
     }
-  }
-
-  toastmessage(String message, bool type) {
-    Fluttertoast.showToast(
-        msg: message,
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: type == true ? Themes.red : Themes.textcolor,
-        textColor: Colors.white,
-        fontSize: 16.0);
   }
 }

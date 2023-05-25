@@ -1,20 +1,20 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_verification_code/flutter_verification_code.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:hospital/model/doctors.dart';
-import 'package:hospital/model/pationtmodel.dart';
+import 'package:hospital/providers/hometabProviders.dart';
 import 'package:hospital/screens/homescreen.dart';
 import 'package:hospital/services/firebase/authentication.dart';
-import 'package:hospital/services/providers/signproviders.dart';
+import 'package:hospital/providers/signproviders.dart';
+import 'package:hospital/services/firebase/firebase_main_functions.dart';
 import 'package:hospital/theme.dart';
+import 'package:hospital/widgets/toast.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
 
 class SmsVerification extends StatefulWidget {
   static const String routname = 'smsscreen';
+
+  const SmsVerification({super.key});
 
   @override
   State<SmsVerification> createState() => _SmsVerificationState();
@@ -25,11 +25,12 @@ class _SmsVerificationState extends State<SmsVerification> {
 
   bool _disabled = false;
   bool verefing = false;
+  bool verefied = false;
   bool wrong = false;
 
   void _startTimer() {
-    Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
+    {
+      Timer.periodic(const Duration(seconds: 1), (timer) {
         if (_countdown > 0) {
           _countdown--;
         } else {
@@ -38,8 +39,19 @@ class _SmsVerificationState extends State<SmsVerification> {
           _countdown = 70;
           timer.cancel();
         }
+        if (verefied) {
+          timer.cancel();
+          return;
+        } else {
+          setState(() {});
+        }
       });
-    });
+    }
+  }
+
+  void goHome() {
+    Navigator.of(context).pushNamedAndRemoveUntil(
+        HomeScreen.routname, (Route<dynamic> route) => false);
   }
 
   void sendAgainVerify() {
@@ -51,12 +63,19 @@ class _SmsVerificationState extends State<SmsVerification> {
   }
 
   @override
+  void initState() {
+    sendAgainVerify();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    print(_disabled);
 //    sendAgainVerify();
     var provider = Provider.of<signprividers>(context);
     var methodprovider = Provider.of<signprividers>(context, listen: false);
+    var homeTabMethods = Provider.of<HmeTabProviders>(context, listen: false);
     FirebaseAuth auth = FirebaseAuth.instance;
+    verefied = provider.verified;
     String url = '';
 
     return Scaffold(
@@ -101,7 +120,7 @@ class _SmsVerificationState extends State<SmsVerification> {
               clearAll: Container(
                 color: Colors.red,
               ),
-              autofocus: false,
+              autofocus: true,
               underlineUnfocusedColor: Colors.transparent,
               fillColor: Themes.backgroundColor,
               textStyle: Theme.of(context)
@@ -111,94 +130,13 @@ class _SmsVerificationState extends State<SmsVerification> {
               keyboardType: TextInputType.number,
               length: 6,
               onCompleted: (message) {
-                sendAgainVerify();
                 verefing = true;
                 setState(() {});
-                try {
-                  auth
-                      .signInWithCredential(PhoneAuthProvider.credential(
-                          verificationId: provider.verificationId,
-                          smsCode: message.trim()))
-                      .then((value) async {
-                    Provider.of<signprividers>(context, listen: false)
-                        .changesmscurser(false);
-                    final ref = FirebaseStorage.instance
-                        .ref()
-                        .child('user_images')
-                        .child('+2${provider.phone}.jpg');
-                    await ref.putFile(provider.imageFile!);
-                    url = await ref.getDownloadURL();
-                  }).then((v) async {
-                    if (provider.isadoctor) {
-                      await FirebaseFirestore.instance
-                          .collection('doctors')
-                          .doc(provider.phone)
-                          .set({
-                        'username': provider.doctorsdata.name,
-                        'password': provider.doctorsdata.password,
-                        'phone': provider.doctorsdata.phoneNumber,
-                        'imageurl': url,
-                        'specialty': provider.doctorsdata.specialty,
-                        'about': provider.doctorsdata.about,
-                        'yersofexp': provider.doctorsdata.yersofexp,
-                        'statworkinghours':
-                            provider.doctorsdata.workinghours.starthour,
-                        'endworkinghours':
-                            provider.doctorsdata.workinghours.endhour,
-                        'workingdays': FieldValue.arrayUnion(
-                            provider.doctorsdata.workinghours.days)
-                      }).then((value) {
-                        toastmessage('Signed up successfully!', false);
-
-                        //     callback(false);
-                        methodprovider.changeloading(false);
-                        DoctorsModel doctorsModel = DoctorsModel(
-                            name: provider.doctorsdata.name,
-                            phoneNumber: provider.doctorsdata.phoneNumber,
-                            specialty: provider.doctorsdata.specialty,
-                            about: provider.doctorsdata.about,
-                            yersofexp: provider.doctorsdata.yersofexp,
-                            imageurl: url,
-                            password: provider.doctorsdata.password,
-                            workinghours: provider.doctorsdata.workinghours);
-                        methodprovider.getdoctorsdata(doctorsModel);
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                            HomeScreen.routname,
-                            (Route<dynamic> route) => false);
-                      });
-                    } else {
-                      await FirebaseFirestore.instance
-                          .collection('pationts')
-                          .doc(provider.phone)
-                          .set({
-                        'username': provider.name,
-                        'password': provider.password,
-                        'phone': provider.phone,
-                        'imageurl': url
-                      }).then((value) {
-                        toastmessage('Signed up successfully!', false);
-
-                        //     callback(false);
-                        methodprovider.changeloading(false);
-
-                        PationtModel pationtModel = PationtModel(
-                          name: provider.name,
-                          phone: provider.phone,
-                          imageurl: url,
-                          password: provider.password,
-                        );
-                        methodprovider.changeisadoctor(false);
-                        methodprovider.getPationtsData(pationtModel);
-                        Navigator.pushReplacementNamed(
-                            context, HomeScreen.routname);
-                      });
-                    }
-                  }).catchError((e) {});
-                } catch (e) {
-                  verefing = true;
-                  wrong = true;
-                  setState(() {});
-                }
+                provider.islogin
+                    ? login(auth, provider, methodprovider, homeTabMethods,
+                        message, url)
+                    : addUser(auth, provider, methodprovider, homeTabMethods,
+                        message, url);
               },
               onEditing: (bool value) {},
             ),
@@ -231,14 +169,13 @@ class _SmsVerificationState extends State<SmsVerification> {
                   ? null
                   : () {
                       sendAgainVerify();
-                      Authentication().verifyPhoneNumber(
-                          context, provider, methodprovider,
-                          resend: true);
+                      Authentication.verifyPhoneNumber(
+                          provider, methodprovider, goHome);
                     },
               child: Text(
                 _disabled
                     ? 'Resend in $_countdown seconds'
-                    : 'Rend Verification Code',
+                    : 'Send Verification Code',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodySmall!.copyWith(
                     color: Theme.of(context).primaryColor, fontSize: 18),
@@ -250,14 +187,80 @@ class _SmsVerificationState extends State<SmsVerification> {
     );
   }
 
-  toastmessage(String message, bool type) {
-    Fluttertoast.showToast(
-        msg: message,
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: type == true ? Themes.red : Themes.textcolor,
-        textColor: Colors.white,
-        fontSize: 16.0);
+  addUser(
+      FirebaseAuth auth,
+      signprividers provider,
+      signprividers methodprovider,
+      HmeTabProviders homeTabMethods,
+      message,
+      url) async {
+    try {
+      final userCredential = await auth.signInWithCredential(
+          PhoneAuthProvider.credential(
+              verificationId: provider.verificationId,
+              smsCode: message.trim()));
+
+      url = await FirebaseMainFunctions.addImage(
+          provider.phone, provider.imageFile);
+      if (provider.isadoctor) {
+        methodprovider.setDoctorsUrl(url);
+
+        await FirebaseMainFunctions.addADoctor(
+                provider.doctorsdata, userCredential.user!.uid)
+            .then((value) {
+          ToastMessage.toastmessage('Signed up successfully!', false);
+
+          methodprovider.changeloading(false);
+          homeTabMethods.setUserData(provider.doctorsdata);
+          methodprovider.changeverified(true);
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              HomeScreen.routname, (Route<dynamic> route) => false);
+        });
+      } else {
+        methodprovider.setPAtiontssUrl(url);
+        methodprovider.setpatentsdata();
+
+        await FirebaseMainFunctions.addAPationt(
+                provider.pationtdata, userCredential.user!.uid)
+            .then((value) {
+          ToastMessage.toastmessage('Signed up successfully!', false);
+          homeTabMethods.setUserData(provider.pationtdata);
+          //     callback(false);
+          methodprovider.changeloading(false);
+
+          methodprovider.changeisadoctor(false);
+          methodprovider.changeverified(true);
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              HomeScreen.routname, (Route<dynamic> route) => false);
+        });
+      }
+    } catch (e) {
+      if (e == 'invalid-verification-code') {
+        verefing = false;
+        wrong = true;
+        setState(() {});
+      }
+    }
+  }
+
+  login(FirebaseAuth auth, provider, methodprovider, homeTabMethods, message,
+      url) async {
+    try {
+      final userCredential = await auth.signInWithCredential(
+          PhoneAuthProvider.credential(
+              verificationId: provider.verificationId,
+              smsCode: message.trim()));
+
+      methodprovider.changeloading(false);
+      methodprovider.changeverified(true);
+
+      Authentication().signin(methodprovider, provider, homeTabMethods, goHome);
+    } catch (e) {
+      if (e == 'invalid-verification-code') {
+        verefing = false;
+        wrong = true;
+        setState(() {});
+      }
+    }
   }
 }

@@ -1,13 +1,15 @@
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:hospital/model/pationtmodel.dart';
-import 'package:hospital/services/providers/signproviders.dart';
+import 'package:hospital/providers/hometabProviders.dart';
+import 'package:hospital/providers/signproviders.dart';
+import 'package:hospital/screens/homescreen.dart';
+import 'package:hospital/screens/smsVirefecatiom.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
 import 'package:hospital/services/firebase/authentication.dart';
 import 'package:hospital/widgets/enterdoctorsdata.dart';
+import 'package:hospital/widgets/toast.dart';
 import 'package:hospital/widgets/user_imagepicker.dart';
 import 'package:provider/provider.dart';
 
@@ -32,14 +34,16 @@ class _SignState extends State<Sign> {
   ];
 
   File? imageFile;
-  void pickedImage(File pickedImage) {
-    imageFile = pickedImage;
+  void goHome() {
+    Navigator.pushReplacementNamed(context, HomeScreen.routname);
   }
 
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<signprividers>(context);
     var methodprovider = Provider.of<signprividers>(context, listen: false);
+    var homeTabProviderMethods =
+        Provider.of<HmeTabProviders>(context, listen: false);
 
     SizeConfig().init(context);
 
@@ -158,48 +162,6 @@ class _SignState extends State<Sign> {
                           ),
                         ),
                       ),
-                      Container(
-                        height: SizeConfig.screenHeight * .08,
-                        margin: EdgeInsets.symmetric(
-                            vertical: getProportionateScreenHeight(10)),
-                        child: TextFormField(
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(color: Themes.grey),
-                          key: const ValueKey('password'),
-                          validator: (value) {
-                            if (value == null ||
-                                value.isEmpty ||
-                                value.length < 7) {
-                              return 'Password must be at leas 7 characters';
-                            }
-                            return null;
-                          },
-                          onSaved: ((newValue) =>
-                              methodprovider.changpassword(newValue!)),
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            errorStyle: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(color: Themes.red, fontSize: 15),
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 25.0, horizontal: 20.0),
-                            fillColor: Themes.backgroundColor,
-                            filled: true,
-                            labelText: 'Password',
-                            labelStyle: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(color: Themes.grey, fontSize: 20),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                        ),
-                      ),
                       if (!provider.islogin)
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -233,19 +195,44 @@ class _SignState extends State<Sign> {
                                       if (provider.days.isEmpty &&
                                           !provider.islogin &&
                                           provider.isadoctor) {
-                                        Authentication().toastmessage(
+                                        ToastMessage.toastmessage(
                                             'Select your working days!', true);
                                         methodprovider.changeloading(false);
                                         return;
                                       }
-
-                                      !provider.islogin
-                                          ? Authentication().chek(
-                                              context, provider, methodprovider)
-                                          : Authentication().signin(
-                                              context,
-                                              provider.phone,
-                                              provider.password);
+                                      if (!provider.islogin) {
+                                        Authentication.chek(
+                                                provider, methodprovider)
+                                            .then((value) {
+                                          if (value) {
+                                            Authentication.verifyPhoneNumber(
+                                                    provider,
+                                                    methodprovider,
+                                                    goHome)
+                                                .then((value) =>
+                                                    Navigator.pushNamed(
+                                                        context,
+                                                        SmsVerification
+                                                            .routname));
+                                          }
+                                        });
+                                      } else {
+                                        Authentication.chek(
+                                                provider, methodprovider)
+                                            .then((value) {
+                                          if (!value) {
+                                            Authentication.verifyPhoneNumber(
+                                                    provider,
+                                                    methodprovider,
+                                                    goHome)
+                                                .then((value) =>
+                                                    Navigator.pushNamed(
+                                                        context,
+                                                        SmsVerification
+                                                            .routname));
+                                          }
+                                        });
+                                      }
                                     } else {
                                       // loadding(false);
                                       methodprovider.changeloading(false);
@@ -323,7 +310,6 @@ class _SignState extends State<Sign> {
   void signOut() async {
     //await FirebaseAuth.instance.signOut();
 
-    print(FirebaseAuth.instance.currentUser);
     // Navigate back to the login or home screen
   }
 
