@@ -42,8 +42,6 @@ class _SignState extends State<Sign> {
   Widget build(BuildContext context) {
     var provider = Provider.of<signprividers>(context);
     var methodprovider = Provider.of<signprividers>(context, listen: false);
-    var homeTabProviderMethods =
-        Provider.of<HmeTabProviders>(context, listen: false);
 
     SizeConfig().init(context);
 

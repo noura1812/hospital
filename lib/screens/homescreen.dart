@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
   static const String routname = 'homescreen';
-  List tabs = [const HomeTab()];
+  List tabs = [HomeTab()];
   int index = 0;
 
   HomeScreen({super.key});

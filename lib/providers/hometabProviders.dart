@@ -3,7 +3,6 @@ import 'package:hospital/model/fieldsmodel.dart';
 
 class HmeTabProviders with ChangeNotifier {
   var userdata;
-
   List<FieldsModel> fields = [
     FieldsModel(
       name: 'Ophthalmology',

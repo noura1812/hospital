@@ -30,10 +30,10 @@ class FirebaseMainFunctions {
     return collection.snapshots();
   }
 
-  static Stream<QuerySnapshot<DoctorsModel>> getDoctorsBySpeciality(
+  static Future<QuerySnapshot<DoctorsModel>> getDoctorsBySpeciality(
       String speciality) {
     var collection = getDoctorsCollection();
-    return collection.where('specialty', isEqualTo: speciality).snapshots();
+    return collection.where('specialty', isEqualTo: speciality).get();
   }
 
   static Stream<QuerySnapshot<DoctorsModel>> getDoctorsByname(String name) {

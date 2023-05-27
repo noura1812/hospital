@@ -4,9 +4,9 @@ import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
 
 class TopDoctorsCard extends StatelessWidget {
-  DoctorsModel doctorsModel;
+  final DoctorsModel doctorsModel;
 
-  TopDoctorsCard({required this.doctorsModel, super.key});
+  const TopDoctorsCard({required this.doctorsModel, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,8 @@ class TopDoctorsCard extends StatelessWidget {
     stars = stars / doctorsModel.reviews.length;
     return Container(
       decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(20)),
+          color: Themes.lighbackgroundColor,
+          borderRadius: BorderRadius.circular(20)),
       width: SizeConfig.screenWidth * .41,
       padding: EdgeInsets.all(getProportionateScreenWidth(10)),
       child: Column(

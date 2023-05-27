@@ -190,7 +190,8 @@ class _SmsVerificationState extends State<SmsVerification> {
                 Container(
                   width: double.infinity,
                   height: SizeConfig.screenHeight * .08,
-                  margin: const EdgeInsets.only(top: 20, bottom: 30),
+                  margin: const EdgeInsets.only(
+                      top: 20, bottom: 30, right: 30, left: 30),
                   child: ElevatedButton(
                     onPressed: provider.loading
                         ? null

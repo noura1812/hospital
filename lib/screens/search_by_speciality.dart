@@ -5,23 +5,24 @@ import 'package:hospital/providers/hometabProviders.dart';
 import 'package:hospital/services/firebase/firebase_main_functions.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
-import 'package:hospital/widgets/doctorsLongCard.dart';
+import 'package:hospital/widgets/sorted_doctors.dart';
 import 'package:hospital/widgets/top_doctors_card.dart';
 import 'package:provider/provider.dart';
 
 class SearchBySpecialityScreen extends StatelessWidget {
   static const String routname = 'SearchBySpecialityScreen';
   const SearchBySpecialityScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
     var homeTabProvider = Provider.of<HmeTabProviders>(context);
     var homeTabMethods = Provider.of<HmeTabProviders>(context, listen: false);
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            size: 25,
+          ),
           onPressed: () {
             homeTabMethods.changeSpeciality('');
             homeTabMethods.resetFields();
@@ -62,7 +63,7 @@ class SearchBySpecialityScreen extends StatelessWidget {
                 ],
               ),
             ),
-            StreamBuilder(
+            FutureBuilder(
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Expanded(
@@ -81,12 +82,12 @@ class SearchBySpecialityScreen extends StatelessWidget {
                     ),
                   );
                 }
-                print(doctorsModel[0].reviews.length);
                 return Expanded(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(
-                        height: getProportionateScreenWidth(200),
+                        height: getProportionateScreenWidth(180),
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: doctorsModel.length < 10
@@ -105,23 +106,12 @@ class SearchBySpecialityScreen extends StatelessWidget {
                           },
                         ),
                       ),
-                      SizedBox(
-                        height: getProportionateScreenWidth(15),
-                      ),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: doctorsModel.length,
-                          itemBuilder: (context, index) {
-                            return DoctorsLongCard(
-                                doctorsModel: doctorsModel[index]);
-                          },
-                        ),
-                      ),
+                      SortedDoctors(),
                     ],
                   ),
                 );
               },
-              stream: FirebaseMainFunctions.getDoctorsBySpeciality(
+              future: FirebaseMainFunctions.getDoctorsBySpeciality(
                   homeTabProvider.speciality),
             ),
           ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hospital/model/doctors.dart';
 import 'package:hospital/model/fieldsmodel.dart';
 import 'package:hospital/providers/hometabProviders.dart';
+import 'package:hospital/screens/search_by_name.dart';
 import 'package:hospital/screens/search_by_speciality.dart';
 import 'package:hospital/services/firebase/firebase_main_functions.dart';
 import 'package:hospital/services/size_config.dart';
@@ -9,20 +10,15 @@ import 'package:hospital/theme.dart';
 import 'package:hospital/widgets/doctorsLongCard.dart';
 import 'package:provider/provider.dart';
 
-class HomeTab extends StatefulWidget {
-  const HomeTab({super.key});
+class HomeTab extends StatelessWidget {
+  HomeTab({super.key});
 
-  @override
-  State<HomeTab> createState() => _HomeTabState();
-}
-
-class _HomeTabState extends State<HomeTab> {
   TextEditingController searchController = TextEditingController();
+  var focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-
     var homeTabProvider = Provider.of<HmeTabProviders>(context);
     return Padding(
       padding: EdgeInsets.all(getProportionateScreenWidth(15)),
@@ -47,6 +43,12 @@ class _HomeTabState extends State<HomeTab> {
           padding:
               EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(30)),
           child: TextFormField(
+            focusNode: focusNode,
+            onTap: () {
+              focusNode.unfocus();
+
+              Navigator.pushNamed(context, SearchByName.routname);
+            },
             style: Theme.of(context)
                 .textTheme
                 .bodySmall

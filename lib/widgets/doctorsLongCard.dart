@@ -5,8 +5,8 @@ import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
 
 class DoctorsLongCard extends StatelessWidget {
-  DoctorsModel doctorsModel;
-  DoctorsLongCard({
+  final DoctorsModel doctorsModel;
+  const DoctorsLongCard({
     super.key,
     required this.doctorsModel,
   });
@@ -27,7 +27,7 @@ class DoctorsLongCard extends StatelessWidget {
           Column(
             children: [
               CircleAvatar(
-                radius: 33,
+                radius: 32,
                 backgroundColor: Theme.of(context).primaryColor,
                 child: CircleAvatar(
                   radius: 30,
