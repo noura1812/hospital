@@ -1,164 +1,109 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_verification_code/flutter_verification_code.dart';
-import 'package:hospital/screens/homescreen.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-
-import 'package:hospital/theme.dart';
+import 'package:hospital/model/doctors.dart';
+import 'package:hospital/model/pationtmodel.dart';
+import 'package:hospital/providers/signproviders.dart';
+import 'package:hospital/services/firebase/firebase_main_functions.dart';
+import 'package:hospital/widgets/toast.dart';
 
 class Authentication {
-  FirebaseAuth auth = FirebaseAuth.instance;
-
-// Function to verify phone number
-  Future<void> verifyPhoneNumber(String phoneNumber, context, pationtdata,
-      void Function(bool) callback) async {
+  static Future<void> verifyPhoneNumber(
+      provider, methodprovider, Function goHome) async {
+    FirebaseAuth auth = FirebaseAuth.instance;
     auth.verifyPhoneNumber(
-      timeout: const Duration(minutes: 5),
-      phoneNumber: phoneNumber,
+      timeout: const Duration(seconds: 60),
+      phoneNumber: '+2${provider.phone}',
       verificationCompleted: (PhoneAuthCredential credential) async {
-        auth.signInWithCredential(credential).then((result) {
-          Navigator.pushReplacementNamed(context, HomeScreen.routname);
-        }).catchError((e) {});
+        auth.signInWithCredential(credential);
       },
       verificationFailed: (FirebaseAuthException e) {
-        callback(false);
+        methodprovider.changeloading(false);
+
         if (e.code == 'invalid-phone-number') {
-          toastmessage('Invalid phone number.', true);
+          ToastMessage.toastmessage('Invalid phone number.', true);
         } else if (e.code == 'session-expired') {
-          toastmessage('try again later.', true);
+          ToastMessage.toastmessage('try again later.', true);
         } else if (e.code == 'code-expired') {
-          toastmessage('Code expired try again later.', true);
+          ToastMessage.toastmessage('Code expired try again later.', true);
         } else if (e.code == 'invalid-verification-code') {
-          toastmessage('Invalid verification code.', true);
+          ToastMessage.toastmessage('Invalid verification code.', true);
         } else {
-          toastmessage('There was an arror try again later.', true);
+          ToastMessage.toastmessage(
+              'There was an arror try again later.', true);
         }
       },
       codeSent: (String verificationId, [int? forceResendingToken]) {
-        String smsCode = '';
-        //show dialog to take input from the user
-        showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => AlertDialog(
-                    title: Text(
-                      "Enter SMS Code",
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    content: SizedBox(
-                      width: 500,
-                      height: 50,
-                      child: VerificationCode(
-                        itemSize: 40,
-                        textStyle: Theme.of(context)
-                            .textTheme
-                            .bodySmall!
-                            .copyWith(color: Themes.grey, fontSize: 20),
-                        keyboardType: TextInputType.number,
-                        length: 6,
-                        onCompleted: (message) {
-                          smsCode = message.trim();
-                          auth
-                              .signInWithCredential(
-                                  PhoneAuthProvider.credential(
-                                      verificationId: verificationId,
-                                      smsCode: smsCode))
-                              .then((v) async {
-                            await FirebaseFirestore.instance
-                                .collection('users')
-                                .doc(phoneNumber.substring(2))
-                                .set({
-                              'username': pationtdata.name,
-                              'password': pationtdata.password,
-                              'phone': pationtdata.phone
-                            }).then((value) {
-                              toastmessage('Signed up successfully!', false);
-
-                              callback(false);
-                              Navigator.pushReplacementNamed(
-                                  context, HomeScreen.routname);
-                            });
-                          }).catchError((e) {});
-                        },
-                        autofocus: true,
-                        onEditing: (bool value) {},
-                      ),
-                    ),
-                    actions: [
-                      TextButton(
-                          onPressed: () {
-                            callback(false);
-
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            'Cancel',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall!
-                                .copyWith(color: Themes.red, fontSize: 20),
-                          ))
-                    ]));
+        methodprovider.changeVerificationId(verificationId);
       },
-      codeAutoRetrievalTimeout: (String verificationId) {
-        toastmessage('Sms time out try again later.', true);
-      },
+      codeAutoRetrievalTimeout: (String verificationId) {},
     );
   }
 
-  void signin(context, String phone, String password,
-      void Function(bool) callback) async {
-    final userData =
-        await FirebaseFirestore.instance.collection('users').doc(phone).get();
+  void signin(
+      //get users data
+      methodprovider,
+      provider,
+      homeTabProviderMethods,
+      Function goHome) async {
+    final doctorsdata =
+        await FirebaseMainFunctions.searchForADoctors(provider.phone);
+    final pationtssdata =
+        await FirebaseMainFunctions.searchForAPationt(provider.phone);
 
-    if (userData.exists) {
-      var data = userData;
-      if (data['password'] == password) {
-        callback(false);
-        toastmessage('logged in successfully!', false);
+    if (doctorsdata.docs.isNotEmpty || pationtssdata.docs.isNotEmpty) {
+      methodprovider.changeloading(false);
 
-        Navigator.pushReplacementNamed(context, HomeScreen.routname);
-        //return PationtModel(
-        //  name: data['username'], phone: phone, password: password);
+      if (doctorsdata.docs.isNotEmpty) {
+        DoctorsModel doctorsModel = doctorsdata.docs[0].data();
+        methodprovider.changeisadoctor(true);
+        methodprovider.getdoctorsdata(doctorsModel);
       } else {
-        callback(false);
-
-        toastmessage('Wrong password!', true);
+        PationtModel pationtModel = pationtssdata.docs[0].data();
+        methodprovider.changeisadoctor(false);
+        methodprovider.getPationtsData(pationtModel);
       }
-    } else {
-      callback(false);
 
-      toastmessage('Invalid phone number try sining up!', true);
+      ToastMessage.toastmessage('logged in successfully!', false);
+
+      homeTabProviderMethods.setUserData(
+          provider.isadoctor ? provider.doctorsdata : provider.pationtdata);
+
+      goHome();
+    } else {
+      methodprovider.changeloading(false);
+
+      ToastMessage.toastmessage('Invalid phone number!', true);
     }
   }
 
-  chek(String phoneNumber, context, pationtdata,
-      void Function(bool) callback) async {
-    final userData = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(pationtdata.phone)
-        .get();
+  static Future<bool> chek(signprividers provider, methodprovider) async {
+    final doctorsdata =
+        await FirebaseMainFunctions.searchForADoctors(provider.phone);
 
-    if (userData.exists) {
-      callback(false);
+    final pationtssdata =
+        await FirebaseMainFunctions.searchForAPationt(provider.phone);
+    if (doctorsdata.docs.isNotEmpty || pationtssdata.docs.isNotEmpty) {
+      methodprovider.changeloading(false);
 
-      toastmessage('already signed up try signing in!', true);
-      return true;
-    } else {
-      verifyPhoneNumber(phoneNumber, context, pationtdata, callback);
+      provider.islogin
+          ? null
+          : ToastMessage.toastmessage(
+              'already signed up try signing in!', true);
       return false;
-    }
-  }
+    } else {
+      if (provider.islogin) {
+        ToastMessage.toastmessage('Invaled Phone Number!', true);
+        methodprovider.changeloading(false);
 
-  toastmessage(String message, bool type) {
-    Fluttertoast.showToast(
-        msg: message,
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: type == true ? Themes.red : Themes.textcolor,
-        textColor: Colors.white,
-        fontSize: 16.0);
+        return true;
+      }
+      if (provider.imageFile == null) {
+        methodprovider.changeloading(false);
+
+        ToastMessage.toastmessage('Please add your image.', true);
+        return false;
+      } else {
+        return true;
+      }
+    }
   }
 }

@@ -42,7 +42,7 @@ class Themes {
           ),
           bodySmall: TextStyle(
               fontFamily: 'gotham',
-              fontSize: 17,
+              fontSize: 20,
               fontWeight: FontWeight.w400,
               color: textcolor)),
       appBarTheme: const AppBarTheme(
@@ -52,6 +52,5 @@ class Themes {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        centerTitle: true,
       ));
 }
