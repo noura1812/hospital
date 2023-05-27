@@ -20,13 +20,22 @@ class DoctorsLongCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         color: Themes.lighbackgroundColor,
       ),
-      height: SizeConfig.screenHeight * .1,
+      height: SizeConfig.screenHeight * .114,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircleAvatar(
-            radius: 30,
-            backgroundImage: NetworkImage(doctorsModel.imageurl),
-            backgroundColor: Theme.of(context).primaryColor,
+          Column(
+            children: [
+              CircleAvatar(
+                radius: 33,
+                backgroundColor: Theme.of(context).primaryColor,
+                child: CircleAvatar(
+                  radius: 30,
+                  backgroundImage: NetworkImage(doctorsModel.imageurl),
+                  backgroundColor: Theme.of(context).primaryColor,
+                ),
+              ),
+            ],
           ),
           Container(
             width: getProportionateScreenWidth(10),
@@ -36,8 +45,8 @@ class DoctorsLongCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                doctorsModel.name.substring(0, 1).toUpperCase() +
-                    doctorsModel.name.substring(1),
+                (doctorsModel.name.substring(0, 1).toUpperCase() +
+                    doctorsModel.name.substring(1)),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               const SizedBox(

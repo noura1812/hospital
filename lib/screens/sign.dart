@@ -222,14 +222,11 @@ class _SignState extends State<Sign> {
                                             .then((value) {
                                           if (!value) {
                                             Authentication.verifyPhoneNumber(
-                                                    provider,
-                                                    methodprovider,
-                                                    goHome)
-                                                .then((value) =>
-                                                    Navigator.pushNamed(
-                                                        context,
-                                                        SmsVerification
-                                                            .routname));
+                                                provider,
+                                                methodprovider,
+                                                goHome);
+                                            Navigator.pushNamed(context,
+                                                SmsVerification.routname);
                                           }
                                         });
                                       }

@@ -6,6 +6,7 @@ import 'package:hospital/screens/homescreen.dart';
 import 'package:hospital/services/firebase/authentication.dart';
 import 'package:hospital/providers/signproviders.dart';
 import 'package:hospital/services/firebase/firebase_main_functions.dart';
+import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
 import 'package:hospital/widgets/toast.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +23,7 @@ class SmsVerification extends StatefulWidget {
 
 class _SmsVerificationState extends State<SmsVerification> {
   int _countdown = 70;
-
+  String message = '';
   bool _disabled = false;
   bool verefing = false;
   bool verefied = false;
@@ -70,6 +71,8 @@ class _SmsVerificationState extends State<SmsVerification> {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
+
 //    sendAgainVerify();
     var provider = Provider.of<signprividers>(context);
     var methodprovider = Provider.of<signprividers>(context, listen: false);
@@ -85,101 +88,150 @@ class _SmsVerificationState extends State<SmsVerification> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              'We sent you a code to',
-              style: Theme.of(context).textTheme.bodySmall,
+            Column(
+              children: [
+                Text(
+                  'We sent you a code to',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'your mobile number',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                Text(
+                  '+2${provider.phone}',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall!
+                      .copyWith(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(
+                  height: 80,
+                ),
+                Text(
+                  'Enter the code',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(
+                  height: 40,
+                ),
+                VerificationCode(
+                  clearAll: Container(
+                    color: Colors.red,
+                  ),
+                  autofocus: false,
+                  underlineUnfocusedColor: Colors.transparent,
+                  fillColor: Themes.backgroundColor,
+                  textStyle: Theme.of(context)
+                      .textTheme
+                      .bodySmall!
+                      .copyWith(color: Themes.grey, fontSize: 20),
+                  keyboardType: TextInputType.number,
+                  length: 6,
+                  onCompleted: (m) {
+                    message = m;
+                    setState(() {});
+                  },
+                  onEditing: (bool value) {},
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                verefing
+                    ? Text(
+                        'verifying...',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall!
+                            .copyWith(fontSize: 16),
+                      )
+                    : Container(),
+                wrong
+                    ? Text(
+                        'Wrong code',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall!
+                            .copyWith(fontSize: 16, color: Themes.red),
+                      )
+                    : Container(),
+                const SizedBox(
+                  height: 80,
+                ),
+              ],
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            Text(
-              'your mobile number',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            Text(
-              '+2${provider.phone}',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall!
-                  .copyWith(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(
-              height: 80,
-            ),
-            Text(
-              'Enter the code',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(
-              height: 40,
-            ),
-            VerificationCode(
-              clearAll: Container(
-                color: Colors.red,
-              ),
-              autofocus: true,
-              underlineUnfocusedColor: Colors.transparent,
-              fillColor: Themes.backgroundColor,
-              textStyle: Theme.of(context)
-                  .textTheme
-                  .bodySmall!
-                  .copyWith(color: Themes.grey, fontSize: 20),
-              keyboardType: TextInputType.number,
-              length: 6,
-              onCompleted: (message) {
-                verefing = true;
-                setState(() {});
-                provider.islogin
-                    ? login(auth, provider, methodprovider, homeTabMethods,
-                        message, url)
-                    : addUser(auth, provider, methodprovider, homeTabMethods,
-                        message, url);
-              },
-              onEditing: (bool value) {},
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            verefing
-                ? Text(
-                    'verifying...',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall!
-                        .copyWith(fontSize: 16),
-                  )
-                : Container(),
-            wrong
-                ? Text(
-                    'Wrong code',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall!
-                        .copyWith(fontSize: 16, color: Themes.red),
-                  )
-                : Container(),
-            const SizedBox(
-              height: 80,
-            ),
-            TextButton(
-              onPressed: _disabled
-                  ? null
-                  : () {
-                      sendAgainVerify();
-                      Authentication.verifyPhoneNumber(
-                          provider, methodprovider, goHome);
-                    },
-              child: Text(
-                _disabled
-                    ? 'Resend in $_countdown seconds'
-                    : 'Send Verification Code',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                    color: Theme.of(context).primaryColor, fontSize: 18),
-              ),
+            Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: _disabled
+                      ? null
+                      : () {
+                          sendAgainVerify();
+                          Authentication.verifyPhoneNumber(
+                              provider, methodprovider, goHome);
+                        },
+                  child: Text(
+                    _disabled
+                        ? 'Resend in $_countdown seconds'
+                        : 'Send Verification Code',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        color: Theme.of(context).primaryColor, fontSize: 18),
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  height: SizeConfig.screenHeight * .08,
+                  margin: const EdgeInsets.only(top: 20, bottom: 30),
+                  child: ElevatedButton(
+                    onPressed: provider.loading
+                        ? null
+                        : () {
+                            //  loadding(true);
+                            methodprovider.changeloading(true);
+
+                            verefing = true;
+                            setState(() {});
+                            provider.islogin
+                                ? login(auth, provider, methodprovider,
+                                    homeTabMethods, message, url)
+                                : addUser(auth, provider, methodprovider,
+                                    homeTabMethods, message, url);
+                          },
+                    style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        backgroundColor: Theme.of(context).primaryColor),
+                    child: provider.loading
+                        ? const SizedBox(
+                            height: 20.0,
+                            width: 20.0,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 3.5,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(
+                            'verify',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500),
+                          ),
+                  ),
+                ),
+              ],
             )
           ],
         ),
@@ -256,6 +308,8 @@ class _SmsVerificationState extends State<SmsVerification> {
 
       Authentication().signin(methodprovider, provider, homeTabMethods, goHome);
     } catch (e) {
+      print('//////////////////////////////');
+      print(e);
       if (e == 'invalid-verification-code') {
         verefing = false;
         wrong = true;

@@ -13,12 +13,9 @@ class Authentication {
       timeout: const Duration(seconds: 60),
       phoneNumber: '+2${provider.phone}',
       verificationCompleted: (PhoneAuthCredential credential) async {
-        auth.signInWithCredential(credential).then((result) {
-          goHome();
-        }).catchError((e) {});
+        auth.signInWithCredential(credential);
       },
       verificationFailed: (FirebaseAuthException e) {
-        //  callback(false);
         methodprovider.changeloading(false);
 
         if (e.code == 'invalid-phone-number') {
@@ -42,12 +39,15 @@ class Authentication {
   }
 
   void signin(
-      methodprovider, provider, homeTabProviderMethods, Function goHome) async {
+      //get users data
+      methodprovider,
+      provider,
+      homeTabProviderMethods,
+      Function goHome) async {
     final doctorsdata =
         await FirebaseMainFunctions.searchForADoctors(provider.phone);
     final pationtssdata =
         await FirebaseMainFunctions.searchForAPationt(provider.phone);
-//send sms
 
     if (doctorsdata.docs.isNotEmpty || pationtssdata.docs.isNotEmpty) {
       methodprovider.changeloading(false);

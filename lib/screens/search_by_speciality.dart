@@ -6,6 +6,7 @@ import 'package:hospital/services/firebase/firebase_main_functions.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
 import 'package:hospital/widgets/doctorsLongCard.dart';
+import 'package:hospital/widgets/top_doctors_card.dart';
 import 'package:provider/provider.dart';
 
 class SearchBySpecialityScreen extends StatelessWidget {
@@ -44,7 +45,9 @@ class SearchBySpecialityScreen extends StatelessWidget {
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.all(getProportionateScreenWidth(10)),
+        padding: EdgeInsets.symmetric(
+            vertical: getProportionateScreenWidth(10),
+            horizontal: getProportionateScreenWidth(15)),
         child: Column(
           children: [
             Container(
@@ -67,6 +70,10 @@ class SearchBySpecialityScreen extends StatelessWidget {
                 }
                 List<DoctorsModel> doctorsModel =
                     snapshot.data?.docs.map((doc) => doc.data()).toList() ?? [];
+                List<DoctorsModel> sortedDoctors = doctorsModel;
+
+                sortedDoctors.sort(
+                    (a, b) => b.reviews.length.compareTo(a.reviews.length));
                 if (doctorsModel.isEmpty) {
                   return const Expanded(
                     child: Center(
@@ -74,12 +81,43 @@ class SearchBySpecialityScreen extends StatelessWidget {
                     ),
                   );
                 }
+                print(doctorsModel[0].reviews.length);
                 return Expanded(
-                  child: ListView.builder(
-                    itemCount: doctorsModel.length,
-                    itemBuilder: (context, index) {
-                      return DoctorsLongCard(doctorsModel: doctorsModel[index]);
-                    },
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: getProportionateScreenWidth(200),
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: doctorsModel.length < 10
+                              ? doctorsModel.length
+                              : 10,
+                          itemBuilder: (context, index) {
+                            return SizedBox(
+                              child: TopDoctorsCard(
+                                  doctorsModel: sortedDoctors[index]),
+                            );
+                          },
+                          separatorBuilder: (BuildContext context, int index) {
+                            return SizedBox(
+                              width: getProportionateScreenWidth(10),
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        height: getProportionateScreenWidth(15),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: doctorsModel.length,
+                          itemBuilder: (context, index) {
+                            return DoctorsLongCard(
+                                doctorsModel: doctorsModel[index]);
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 );
               },
