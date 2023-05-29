@@ -5,13 +5,21 @@ import 'package:hospital/model/doctors.dart';
 import 'package:hospital/providers/hometabProviders.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
-import 'package:hospital/widgets/toast.dart';
+import 'package:hospital/widgets/reviews_list.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
-class DoctorsScreen extends StatelessWidget {
+class DoctorsScreen extends StatefulWidget {
   static const String routname = 'Doctors screen ';
 
-  const DoctorsScreen({super.key});
+  DoctorsScreen({super.key});
+
+  @override
+  State<DoctorsScreen> createState() => _DoctorsScreenState();
+}
+
+class _DoctorsScreenState extends State<DoctorsScreen> {
+  int index = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +105,7 @@ class DoctorsScreen extends StatelessWidget {
           ),
           Container(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            margin: const EdgeInsets.all(10),
+            margin: const EdgeInsets.all(5),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 color: Themes.backgroundColor),
@@ -148,10 +156,10 @@ class DoctorsScreen extends StatelessWidget {
           isDoctorFound
               ? Container() //should be the appontment date
               : Container(
-                  margin: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.all(5),
                   padding:
                       const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                  height: SizeConfig.screenHeight * .13,
+                  height: SizeConfig.screenHeight * .1,
                   width: SizeConfig.screenWidth * .65,
                   decoration: BoxDecoration(
                       color: Themes.red,
@@ -191,7 +199,130 @@ class DoctorsScreen extends StatelessWidget {
                       )
                     ],
                   ),
-                )
+                ),
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Themes.backgroundColor),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      TextButton(
+                          onPressed: () {
+                            index = 1;
+                            setState(() {});
+                          },
+                          child: Text(
+                            'About',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                    color: index == 1
+                                        ? Theme.of(context).primaryColor
+                                        : Themes.grey,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600),
+                          )),
+                      TextButton(
+                          onPressed: () {
+                            index = 2;
+                            setState(() {});
+                          },
+                          child: Text(
+                            'Reviews',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                    color: index == 2
+                                        ? Theme.of(context).primaryColor
+                                        : Themes.grey,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600),
+                          ))
+                    ],
+                  ),
+                  Expanded(
+                    child: index == 1
+                        ? SingleChildScrollView(
+                            child: AnimationConfiguration.synchronized(
+                            child: FadeInAnimation(
+                              duration: const Duration(seconds: 2),
+                              child: SlideAnimation(
+                                duration: const Duration(milliseconds: 1200),
+                                verticalOffset: 300,
+                                child: Text(
+                                  doctorsModel.about,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .copyWith(
+                                          height: 1.25, // set line height
+
+                                          fontSize: 17,
+                                          color: Themes.grey,
+                                          decorationThickness: 10),
+                                ),
+                              ),
+                            ),
+                          ))
+                        : doctorsModel.reviews.isEmpty
+                            ? Center(
+                                child: Text(
+                                  'No reviews added',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .copyWith(
+                                          height: 1.25, // set line height
+
+                                          fontSize: 17,
+                                          color: Themes.grey,
+                                          decorationThickness: 10),
+                                ),
+                              )
+                            : ListView.separated(
+                                itemCount: doctorsModel.reviews.length,
+                                itemBuilder: (context, index) {
+                                  return AnimationConfiguration.staggeredList(
+                                    position: index,
+                                    duration:
+                                        const Duration(milliseconds: 1000),
+                                    child: SlideAnimation(
+                                      verticalOffset: 300,
+                                      child: ReviewsList(
+                                        reviewsmodel:
+                                            doctorsModel.reviews[index],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                separatorBuilder: (context, index) {
+                                  return Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 5),
+                                      child: const Divider(
+                                        height: 2,
+                                        endIndent: 20,
+                                        indent: 20,
+                                        color: Themes.textcolor,
+                                        thickness: 2,
+                                      ));
+                                },
+                              ),
+                  )
+                ],
+              ),
+            ),
+          )
         ]));
   }
 

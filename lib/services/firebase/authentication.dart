@@ -7,7 +7,7 @@ import 'package:hospital/widgets/toast.dart';
 
 class Authentication {
   static Future<void> verifyPhoneNumber(
-      provider, methodprovider, Function goHome) async {
+      provider, signprividers methodprovider, Function goHome) async {
     FirebaseAuth auth = FirebaseAuth.instance;
     auth.verifyPhoneNumber(
       timeout: const Duration(seconds: 60),

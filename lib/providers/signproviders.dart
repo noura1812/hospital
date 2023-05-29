@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hospital/model/doctors.dart';
 import 'package:hospital/model/pationtmodel.dart';
 import 'package:hospital/model/workinghours.dart';
+import 'package:hospital/services/firebase/firebase_main_functions.dart';
 
 class signprividers with ChangeNotifier {
   bool loading = false;

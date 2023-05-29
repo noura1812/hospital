@@ -26,8 +26,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var provider = Provider.of<HmeTabProviders>(context);
+
     return MaterialApp(
-      initialRoute: Sign.routname,
+      initialRoute:
+          provider.firebaseUser != null ? HomeScreen.routname : Sign.routname,
       routes: {
         Sign.routname: (context) => const Sign(),
         HomeScreen.routname: (context) => HomeScreen(),

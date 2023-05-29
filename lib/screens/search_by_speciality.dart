@@ -16,105 +16,115 @@ class SearchBySpecialityScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     var homeTabProvider = Provider.of<HmeTabProviders>(context);
     var homeTabMethods = Provider.of<HmeTabProviders>(context, listen: false);
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            size: 25,
-          ),
-          onPressed: () {
-            homeTabMethods.changeSpeciality('');
-            homeTabMethods.resetFields();
-            Navigator.pop(context);
-          },
-        ),
-        title: Text(
-          '${homeTabProvider.speciality}s',
-          style:
-              Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 20),
-        ),
-        centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: CircleAvatar(
-                radius: 25,
-                backgroundImage:
-                    NetworkImage(homeTabProvider.userdata.imageurl)),
-          )
-        ],
-      ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(
-            vertical: getProportionateScreenWidth(10),
-            horizontal: getProportionateScreenWidth(15)),
-        child: Column(
-          children: [
-            Container(
-              height: SizeConfig.screenHeight * .13,
-              padding: EdgeInsets.symmetric(
-                  vertical: getProportionateScreenWidth(20)),
-              child: Row(
-                children: [
-                  ...homeTabProvider.fields.map((e) {
-                    return fieldCard(e, context);
-                  }).toList()
-                ],
-              ),
+    return WillPopScope(
+      onWillPop: () {
+        homeTabMethods.changeSpeciality('');
+        homeTabMethods.resetFields();
+        Navigator.pop(context);
+        return Future.value(true);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              size: 25,
             ),
-            FutureBuilder(
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Expanded(
-                      child: Center(child: CircularProgressIndicator()));
-                }
-                List<DoctorsModel> doctorsModel =
-                    snapshot.data?.docs.map((doc) => doc.data()).toList() ?? [];
-                List<DoctorsModel> sortedDoctors = doctorsModel;
+            onPressed: () {
+              homeTabMethods.changeSpeciality('');
+              homeTabMethods.resetFields();
+              Navigator.pop(context);
+            },
+          ),
+          title: Text(
+            '${homeTabProvider.speciality}s',
+            style:
+                Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 20),
+          ),
+          centerTitle: true,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: CircleAvatar(
+                  radius: 25,
+                  backgroundImage:
+                      NetworkImage(homeTabProvider.userdata.imageurl)),
+            )
+          ],
+        ),
+        body: Padding(
+          padding: EdgeInsets.symmetric(
+              vertical: getProportionateScreenWidth(10),
+              horizontal: getProportionateScreenWidth(15)),
+          child: Column(
+            children: [
+              Container(
+                height: SizeConfig.screenHeight * .13,
+                padding: EdgeInsets.symmetric(
+                    vertical: getProportionateScreenWidth(20)),
+                child: Row(
+                  children: [
+                    ...homeTabProvider.fields.map((e) {
+                      return fieldCard(e, context);
+                    }).toList()
+                  ],
+                ),
+              ),
+              FutureBuilder(
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Expanded(
+                        child: Center(child: CircularProgressIndicator()));
+                  }
+                  List<DoctorsModel> doctorsModel =
+                      snapshot.data?.docs.map((doc) => doc.data()).toList() ??
+                          [];
+                  List<DoctorsModel> sortedDoctors = doctorsModel;
 
-                sortedDoctors.sort(
-                    (a, b) => b.reviews.length.compareTo(a.reviews.length));
-                if (doctorsModel.isEmpty) {
-                  return const Expanded(
-                    child: Center(
-                      child: Text('No doctors Available!'),
+                  sortedDoctors.sort(
+                      (a, b) => b.reviews.length.compareTo(a.reviews.length));
+                  if (doctorsModel.isEmpty) {
+                    return const Expanded(
+                      child: Center(
+                        child: Text('No doctors Available!'),
+                      ),
+                    );
+                  }
+                  return Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: getProportionateScreenWidth(180),
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: doctorsModel.length < 10
+                                ? doctorsModel.length
+                                : 10,
+                            itemBuilder: (context, index) {
+                              return SizedBox(
+                                child: TopDoctorsCard(
+                                    doctorsModel: sortedDoctors[index]),
+                              );
+                            },
+                            separatorBuilder:
+                                (BuildContext context, int index) {
+                              return SizedBox(
+                                width: getProportionateScreenWidth(10),
+                              );
+                            },
+                          ),
+                        ),
+                        SortedDoctors(),
+                      ],
                     ),
                   );
-                }
-                return Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: getProportionateScreenWidth(180),
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: doctorsModel.length < 10
-                              ? doctorsModel.length
-                              : 10,
-                          itemBuilder: (context, index) {
-                            return SizedBox(
-                              child: TopDoctorsCard(
-                                  doctorsModel: sortedDoctors[index]),
-                            );
-                          },
-                          separatorBuilder: (BuildContext context, int index) {
-                            return SizedBox(
-                              width: getProportionateScreenWidth(10),
-                            );
-                          },
-                        ),
-                      ),
-                      SortedDoctors(),
-                    ],
-                  ),
-                );
-              },
-              future: FirebaseMainFunctions.getDoctorsBySpeciality(
-                  homeTabProvider.speciality),
-            ),
-          ],
+                },
+                future: FirebaseMainFunctions.getDoctorsBySpeciality(
+                    homeTabProvider.speciality),
+              ),
+            ],
+          ),
         ),
       ),
     );

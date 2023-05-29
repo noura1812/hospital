@@ -64,18 +64,12 @@ class _SortedDoctorsState extends State<SortedDoctors> {
               List<DoctorsModel> doctorsModel =
                   snapshot.data?.docs.map((doc) => doc.data()).toList() ?? [];
               if (indexOfSort == 0) {
-                print('+++++-----------++');
-
                 doctorsModel =
                     snapshot.data?.docs.map((doc) => doc.data()).toList() ?? [];
               } else if (indexOfSort == 1) {
-                print('++++********+++');
-
                 doctorsModel
                     .sort((a, b) => getTotalStars(b) - getTotalStars(a));
               } else if (indexOfSort == 2) {
-                print('++1111111111111+++++');
-
                 doctorsModel.sort(
                     (a, b) => b.reviews.length.compareTo(a.reviews.length));
               } else if (indexOfSort == 3) {

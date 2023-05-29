@@ -41,9 +41,19 @@ class FirebaseMainFunctions {
     return collection.where('name', isEqualTo: name).snapshots();
   }
 
+  static Future<DocumentSnapshot<DoctorsModel>> getDoctorsBId(String id) {
+    var collection = getDoctorsCollection();
+    return collection.doc(id).get();
+  }
+
   static Future<QuerySnapshot<DoctorsModel>> searchForADoctors(phoneNumber) {
     var collection = getDoctorsCollection();
     return collection.where('phoneNumber', isEqualTo: phoneNumber).get();
+  }
+
+  static Future<DocumentSnapshot<PationtModel>> getPationtsBId(String id) {
+    var collection = getPationtsCollection();
+    return collection.doc(id).get();
   }
 
   static CollectionReference<PationtModel> getPationtsCollection() {

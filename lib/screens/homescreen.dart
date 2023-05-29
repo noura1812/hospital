@@ -16,32 +16,40 @@ class HomeScreen extends StatelessWidget {
 
     var homeTabProvider = Provider.of<HmeTabProviders>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Hi !',
-              style: Theme.of(context).textTheme.headlineLarge,
+    return homeTabProvider.userdata == null
+        ? const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
             ),
-            Text(
-              DateTime.now().hour < 12 ? 'Good morning' : 'Good afternoon',
-              style: Theme.of(context).textTheme.bodyMedium,
-            )
-          ],
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: CircleAvatar(
-                radius: 25,
-                backgroundImage:
-                    NetworkImage(homeTabProvider.userdata.imageurl)),
           )
-        ],
-      ),
-      body: tabs[index],
-    );
+        : Scaffold(
+            appBar: AppBar(
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Hi !',
+                    style: Theme.of(context).textTheme.headlineLarge,
+                  ),
+                  Text(
+                    DateTime.now().hour < 12
+                        ? 'Good morning'
+                        : 'Good afternoon',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  )
+                ],
+              ),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: CircleAvatar(
+                      radius: 25,
+                      backgroundImage:
+                          NetworkImage(homeTabProvider.userdata.imageurl)),
+                )
+              ],
+            ),
+            body: tabs[index],
+          );
   }
 }
