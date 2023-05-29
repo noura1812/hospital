@@ -40,8 +40,8 @@ class Authentication {
 
   void signin(
       //get users data
-      methodprovider,
-      provider,
+      signprividers methodprovider,
+      signprividers provider,
       homeTabProviderMethods,
       Function goHome) async {
     final doctorsdata =

@@ -200,6 +200,7 @@ class _SmsVerificationState extends State<SmsVerification> {
                             methodprovider.changeloading(true);
 
                             verefing = true;
+                            wrong = false;
                             setState(() {});
                             provider.islogin
                                 ? login(auth, provider, methodprovider,
@@ -288,7 +289,14 @@ class _SmsVerificationState extends State<SmsVerification> {
         });
       }
     } catch (e) {
+      if (message == '') {
+        verefing = false;
+        wrong = true;
+        setState(() {});
+      }
       if (e == 'invalid-verification-code') {
+        methodprovider.changeloading(false);
+
         verefing = false;
         wrong = true;
         setState(() {});
@@ -296,8 +304,8 @@ class _SmsVerificationState extends State<SmsVerification> {
     }
   }
 
-  login(FirebaseAuth auth, provider, methodprovider, homeTabMethods, message,
-      url) async {
+  login(FirebaseAuth auth, signprividers provider, signprividers methodprovider,
+      homeTabMethods, message, url) async {
     try {
       final userCredential = await auth.signInWithCredential(
           PhoneAuthProvider.credential(
@@ -309,9 +317,16 @@ class _SmsVerificationState extends State<SmsVerification> {
 
       Authentication().signin(methodprovider, provider, homeTabMethods, goHome);
     } catch (e) {
+      methodprovider.changeloading(false);
+
       print('//////////////////////////////');
       print(e);
       if (e == 'invalid-verification-code') {
+        verefing = false;
+        wrong = true;
+        setState(() {});
+      }
+      if (message == '') {
         verefing = false;
         wrong = true;
         setState(() {});

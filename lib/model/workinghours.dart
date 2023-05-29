@@ -2,7 +2,7 @@
 class WorkingHoursModel {
   String starthour;
   String endhour;
-  List days;
+  List<int> days;
   WorkingHoursModel({
     required this.starthour,
     required this.endhour,

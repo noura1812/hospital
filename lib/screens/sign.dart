@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:hospital/providers/hometabProviders.dart';
 import 'package:hospital/providers/signproviders.dart';
 import 'package:hospital/screens/homescreen.dart';
 import 'package:hospital/screens/smsVirefecatiom.dart';
@@ -172,128 +171,125 @@ class _SignState extends State<Sign> {
                         EnterDocsData(),
                     ]),
                   ),
-                  Container(
-                    alignment: Alignment.bottomCenter,
-                    child: Column(
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          height: SizeConfig.screenHeight * .08,
-                          margin: const EdgeInsets.only(top: 20),
-                          child: ElevatedButton(
-                            onPressed: provider.loading
-                                ? null
-                                : () {
-                                    //  loadding(true);
+                  Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: SizeConfig.screenHeight * .08,
+                        margin: const EdgeInsets.only(top: 20),
+                        child: ElevatedButton(
+                          onPressed: provider.loading
+                              ? null
+                              : () {
+                                  //  loadding(true);
 
-                                    methodprovider.changeloading(true);
-                                    bool validate = _subnmit();
-                                    if (validate == true) {
-                                      methodprovider.setdoctorsdata();
-                                      if (provider.days.isEmpty &&
-                                          !provider.islogin &&
-                                          provider.isadoctor) {
-                                        ToastMessage.toastmessage(
-                                            'Select your working days!', true);
-                                        methodprovider.changeloading(false);
-                                        return;
-                                      }
-                                      if (!provider.islogin) {
-                                        Authentication.chek(
-                                                provider, methodprovider)
-                                            .then((value) {
-                                          if (value) {
-                                            Authentication.verifyPhoneNumber(
-                                                    provider,
-                                                    methodprovider,
-                                                    goHome)
-                                                .then((value) =>
-                                                    Navigator.pushNamed(
-                                                        context,
-                                                        SmsVerification
-                                                            .routname));
-                                          }
-                                        });
-                                      } else {
-                                        Authentication.chek(
-                                                provider, methodprovider)
-                                            .then((value) {
-                                          if (!value) {
-                                            Authentication.verifyPhoneNumber(
-                                                provider,
-                                                methodprovider,
-                                                goHome);
-                                            Navigator.pushNamed(context,
-                                                SmsVerification.routname);
-                                          }
-                                        });
-                                      }
-                                    } else {
-                                      // loadding(false);
+                                  methodprovider.changeloading(true);
+                                  bool validate = _subnmit();
+                                  if (validate == true) {
+                                    methodprovider.setdoctorsdata();
+                                    if (provider.days.isEmpty &&
+                                        !provider.islogin &&
+                                        provider.isadoctor) {
+                                      ToastMessage.toastmessage(
+                                          'Select your working days!', true);
                                       methodprovider.changeloading(false);
+                                      return;
                                     }
-                                  },
-                            style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                ),
-                                backgroundColor:
-                                    Theme.of(context).primaryColor),
-                            child: provider.loading
-                                ? const SizedBox(
-                                    height: 20.0,
-                                    width: 20.0,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 3.5,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : Text(
-                                    provider.islogin ? 'Sign in' : "Sign up",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall
-                                        ?.copyWith(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500),
+                                    if (!provider.islogin) {
+                                      Authentication.chek(
+                                              provider, methodprovider)
+                                          .then((value) {
+                                        if (value) {
+                                          Authentication.verifyPhoneNumber(
+                                                  provider,
+                                                  methodprovider,
+                                                  goHome)
+                                              .then((value) {
+                                            methodprovider.changeloading(false);
+
+                                            return Navigator.pushNamed(context,
+                                                SmsVerification.routname);
+                                          });
+                                        }
+                                      });
+                                    } else {
+                                      Authentication.chek(
+                                              provider, methodprovider)
+                                          .then((value) {
+                                        if (!value) {
+                                          methodprovider.changeloading(false);
+
+                                          Authentication.verifyPhoneNumber(
+                                              provider, methodprovider, goHome);
+                                          Navigator.pushNamed(context,
+                                              SmsVerification.routname);
+                                        }
+                                      });
+                                    }
+                                  } else {
+                                    // loadding(false);
+                                    methodprovider.changeloading(false);
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              backgroundColor: Theme.of(context).primaryColor),
+                          child: provider.loading
+                              ? const SizedBox(
+                                  height: 20.0,
+                                  width: 20.0,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 3.5,
+                                    color: Colors.white,
                                   ),
+                                )
+                              : Text(
+                                  provider.islogin ? 'Sign in' : "Sign up",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            provider.islogin
+                                ? "Don't have an account?"
+                                : "Have an account?",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                                    color: Themes.grey,
+                                    fontWeight: FontWeight.w500),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              provider.islogin
-                                  ? "Don't have an account?"
-                                  : "Have an account?",
+                          InkWell(
+                            onTap: () {
+                              methodprovider.changeislogin(!provider.islogin);
+                            },
+                            child: Text(
+                              provider.islogin ? " Sign up " : "Sign in",
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall
                                   ?.copyWith(
-                                      color: Themes.grey,
+                                      color: Themes.textcolor,
                                       fontWeight: FontWeight.w500),
                             ),
-                            InkWell(
-                              onTap: () {
-                                methodprovider.changeislogin(!provider.islogin);
-                              },
-                              child: Text(
-                                provider.islogin ? " Sign up " : "Sign in",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(
-                                        color: Themes.textcolor,
-                                        fontWeight: FontWeight.w500),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                    ],
                   )
                 ],
               ),

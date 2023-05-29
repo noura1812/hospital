@@ -15,10 +15,11 @@ class signprividers with ChangeNotifier {
   int countDown = 70;
   String verificationId = '';
   File? imageFile;
-  PationtModel pationtdata = PationtModel(name: '', phone: '', imageurl: '');
+  PationtModel pationtdata =
+      PationtModel(name: '', phoneNumber: '', imageurl: '', appointments: []);
 
   String specialty = 'Ophthalmologist';
-  List days = [];
+  List<int> days = [];
   String about = '';
   String yersofexp = '';
 
@@ -59,7 +60,8 @@ class signprividers with ChangeNotifier {
       yersofexp: '',
       imageurl: '',
       reviews: [],
-      workinghours: WorkingHoursModel(starthour: '', endhour: '', days: []));
+      workinghours: WorkingHoursModel(starthour: '', endhour: '', days: []),
+      appointments: []);
 
   changeloading(bool value) {
     loading = value;
@@ -83,18 +85,21 @@ class signprividers with ChangeNotifier {
         workinghours: WorkingHoursModel(
             starthour: '$starttime $startpm',
             endhour: '$endtime $endpm',
-            days: days));
+            days: days),
+        appointments: []);
     notifyListeners();
   }
 
   setpatentsdata() {
-    pationtdata = PationtModel(name: name, phone: phone, imageurl: imageurl);
+    pationtdata = PationtModel(
+        name: name, phoneNumber: phone, imageurl: imageurl, appointments: []);
     notifyListeners();
   }
 
   getdoctorsdata(DoctorsModel doctorsModel) {
     doctorsdata = DoctorsModel(
         reviews: [],
+        id: doctorsModel.id,
         name: doctorsModel.name,
         phoneNumber: doctorsModel.phoneNumber,
         specialty: doctorsModel.specialty,
@@ -104,7 +109,8 @@ class signprividers with ChangeNotifier {
         workinghours: WorkingHoursModel(
             starthour: doctorsModel.workinghours.starthour,
             endhour: doctorsModel.workinghours.endhour,
-            days: doctorsModel.workinghours.days));
+            days: doctorsModel.workinghours.days),
+        appointments: []);
     notifyListeners();
   }
 
@@ -121,8 +127,10 @@ class signprividers with ChangeNotifier {
   getPationtsData(PationtModel pationtModel) {
     pationtdata = PationtModel(
         name: pationtModel.name,
-        phone: pationtModel.phone,
-        imageurl: pationtModel.imageurl);
+        id: pationtdata.id,
+        phoneNumber: pationtModel.phoneNumber,
+        imageurl: pationtModel.imageurl,
+        appointments: []);
   }
 
   setdayvalue(value) {

@@ -4,9 +4,8 @@ class Themes {
   static const Color backgroundColor = Color(0xfff9f9f9);
   static const Color lighbackgroundColor = Color(0xffffffff);
   static const Color textcolor = Color(0xff4b4b4b);
-  static const Color lightblue = Color(0xff01b0ef);
-  static const Color darkblue = Color(0xff0041a8);
-  static const Color yeloo = Color(0xff0041a8);
+  static const Color lightblue = Color(0xff56ccf2);
+  static const Color blue = Color(0xff01b0ef);
   static const Color lightgrey = Color(0xff9a9a9a);
   static const Color grey = Color(0xff8c8c8c);
   static const Color red = Color(0xffff6f3c);

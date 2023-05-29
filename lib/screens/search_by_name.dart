@@ -26,6 +26,7 @@ class _SearchByNameState extends State<SearchByName> {
     var homeTabProvider = Provider.of<HmeTabProviders>(context);
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_ios,
@@ -35,18 +36,10 @@ class _SearchByNameState extends State<SearchByName> {
             Navigator.pop(context);
           },
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Hi !',
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-            Text(
-              DateTime.now().hour < 12 ? 'Good morning' : 'Good afternoon',
-              style: Theme.of(context).textTheme.bodyMedium,
-            )
-          ],
+        title: Text(
+          'Search',
+          style:
+              Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 20),
         ),
         actions: [
           Padding(
