@@ -42,8 +42,9 @@ class HmeTabProviders with ChangeNotifier {
     }
   }
   void chekUser() async {
-    var doctor = await FirebaseMainFunctions.getDoctorsBId(firebaseUser!.uid);
-    var pationt = await FirebaseMainFunctions.getPationtsBId(firebaseUser!.uid);
+    var doctor = await FirebaseMainFunctions.getDoctorsById(firebaseUser!.uid);
+    var pationt =
+        await FirebaseMainFunctions.getPationtsById(firebaseUser!.uid);
     if (doctor.exists) {
       userdata = doctor.data()!;
       notifyListeners();

@@ -319,8 +319,6 @@ class _SmsVerificationState extends State<SmsVerification> {
     } catch (e) {
       methodprovider.changeloading(false);
 
-      print('//////////////////////////////');
-      print(e);
       if (e == 'invalid-verification-code') {
         verefing = false;
         wrong = true;

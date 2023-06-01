@@ -3,20 +3,20 @@ class Appointment {
   String pationtsID;
   String doctorsID;
   int date;
-  String time;
+  String complains;
   Appointment({
     required this.id,
     required this.pationtsID,
     required this.doctorsID,
     required this.date,
-    required this.time,
+    required this.complains,
   });
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'pationtsID': pationtsID,
       'doctorsID': doctorsID,
-      'time': time,
+      'complains': complains,
       'date': date
     };
   }
@@ -27,5 +27,5 @@ class Appointment {
             doctorsID: json['doctorsID'],
             id: json['id'],
             pationtsID: json['pationtsID'],
-            time: json['time']);
+            complains: json['complains']);
 }

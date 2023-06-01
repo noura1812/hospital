@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hospital/model/appointment.dart';
 import 'package:hospital/model/doctors.dart';
 import 'package:hospital/providers/hometabProviders.dart';
+import 'package:hospital/screens/booking_creen.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
 import 'package:hospital/widgets/reviews_list.dart';
@@ -71,7 +72,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
             ),
           ),
           SizedBox(
-            height: getProportionateScreenWidth(15),
+            height: getProportionateScreenHeight(5),
           ),
           Text(
             doctorsModel.specialty,
@@ -81,7 +82,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                 .copyWith(fontSize: 20, fontWeight: FontWeight.w400),
           ),
           SizedBox(
-            height: getProportionateScreenWidth(7),
+            height: getProportionateScreenHeight(2),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -101,7 +102,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
             ],
           ),
           SizedBox(
-            height: getProportionateScreenWidth(15),
+            height: getProportionateScreenHeight(5),
           ),
           Container(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
@@ -137,6 +138,8 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                   margin: const EdgeInsets.symmetric(vertical: 10),
                   child: ElevatedButton(
                     onPressed: () {
+                      Navigator.pushNamed(context, BookingScreen.routname,
+                          arguments: doctorsModel);
                       //move to boking screen
                     },
                     style: ElevatedButton.styleFrom(

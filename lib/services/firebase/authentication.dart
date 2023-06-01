@@ -56,16 +56,15 @@ class Authentication {
         DoctorsModel doctorsModel = doctorsdata.docs[0].data();
         methodprovider.changeisadoctor(true);
         methodprovider.getdoctorsdata(doctorsModel);
+        homeTabProviderMethods.setUserData(doctorsModel);
       } else {
         PationtModel pationtModel = pationtssdata.docs[0].data();
         methodprovider.changeisadoctor(false);
         methodprovider.getPationtsData(pationtModel);
+        homeTabProviderMethods.setUserData(pationtModel);
       }
 
       ToastMessage.toastmessage('logged in successfully!', false);
-
-      homeTabProviderMethods.setUserData(
-          provider.isadoctor ? provider.doctorsdata : provider.pationtdata);
 
       goHome();
     } else {
@@ -76,33 +75,38 @@ class Authentication {
   }
 
   static Future<bool> chek(signprividers provider, methodprovider) async {
+    print(provider.phone);
     final doctorsdata =
         await FirebaseMainFunctions.searchForADoctors(provider.phone);
 
     final pationtssdata =
         await FirebaseMainFunctions.searchForAPationt(provider.phone);
-    if (doctorsdata.docs.isNotEmpty || pationtssdata.docs.isNotEmpty) {
-      methodprovider.changeloading(false);
 
-      provider.islogin
-          ? null
-          : ToastMessage.toastmessage(
-              'already signed up try signing in!', true);
-      return false;
-    } else {
-      if (provider.islogin) {
+    if (provider.islogin) {
+      if (doctorsdata.docs.isNotEmpty || pationtssdata.docs.isNotEmpty) {
+        methodprovider.changeloading(false);
+        return true;
+      } else {
         ToastMessage.toastmessage('Invaled Phone Number!', true);
         methodprovider.changeloading(false);
 
-        return true;
+        return false;
       }
-      if (provider.imageFile == null) {
+    } else {
+      if (doctorsdata.docs.isNotEmpty || pationtssdata.docs.isNotEmpty) {
         methodprovider.changeloading(false);
 
-        ToastMessage.toastmessage('Please add your image.', true);
+        ToastMessage.toastmessage('already signed up try signing in!', true);
         return false;
       } else {
-        return true;
+        if (provider.imageFile == null) {
+          methodprovider.changeloading(false);
+
+          ToastMessage.toastmessage('Please add your image.', true);
+          return false;
+        } else {
+          return true;
+        }
       }
     }
   }

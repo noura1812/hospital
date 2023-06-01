@@ -41,7 +41,7 @@ class FirebaseMainFunctions {
     return collection.where('name', isEqualTo: name).snapshots();
   }
 
-  static Future<DocumentSnapshot<DoctorsModel>> getDoctorsBId(String id) {
+  static Future<DocumentSnapshot<DoctorsModel>> getDoctorsById(String id) {
     var collection = getDoctorsCollection();
     return collection.doc(id).get();
   }
@@ -51,7 +51,19 @@ class FirebaseMainFunctions {
     return collection.where('phoneNumber', isEqualTo: phoneNumber).get();
   }
 
-  static Future<DocumentSnapshot<PationtModel>> getPationtsBId(String id) {
+  static Future<void> updateDoctors(DoctorsModel doctorsModel) {
+    return getDoctorsCollection()
+        .doc(doctorsModel.id)
+        .update({
+          'appointments': List<dynamic>.from(doctorsModel.appointments
+              .map((appointment) => appointment.toJson()))
+        })
+        .then((value) => print("User Updated"))
+        .catchError((error) => print("Failed to update user: $error"));
+  }
+/////////////////////////////////////////////////////////////////////////////////////
+
+  static Future<DocumentSnapshot<PationtModel>> getPationtsById(String id) {
     var collection = getPationtsCollection();
     return collection.doc(id).get();
   }
@@ -83,7 +95,7 @@ class FirebaseMainFunctions {
 
   static Future<QuerySnapshot<PationtModel>> searchForAPationt(phoneNumber) {
     var collection = getPationtsCollection();
-    return collection.where('phone', isEqualTo: phoneNumber).get();
+    return collection.where('phoneNumber', isEqualTo: phoneNumber).get();
   }
 
   static Future<String> addImage(phone, imageFile) {
@@ -93,5 +105,16 @@ class FirebaseMainFunctions {
         .child('+2$phone.jpg');
     ref.putFile(imageFile);
     return ref.getDownloadURL();
+  }
+
+  static Future<void> updatePationt(PationtModel pationtModel) {
+    return getPationtsCollection()
+        .doc(pationtModel.id)
+        .update({
+          'appointments': List<dynamic>.from(pationtModel.appointments
+              .map((appointment) => appointment.toJson()))
+        })
+        .then((value) => print("User Updated"))
+        .catchError((error) => print("Failed to update user: $error"));
   }
 }

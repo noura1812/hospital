@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:hospital/screens/booking_creen.dart';
 import 'package:hospital/screens/doctors_screen.dart';
 import 'package:hospital/screens/homescreen.dart';
 import 'package:hospital/screens/search_by_name.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
         SmsVerification.routname: (context) => const SmsVerification(),
         SearchByName.routname: (context) => SearchByName(),
         DoctorsScreen.routname: (context) => DoctorsScreen(),
+        BookingScreen.routname: (context) => BookingScreen(),
         SearchBySpecialityScreen.routname: (context) =>
             const SearchBySpecialityScreen(),
       },

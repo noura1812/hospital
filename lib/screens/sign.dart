@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hospital/providers/signproviders.dart';
 import 'package:hospital/screens/homescreen.dart';
@@ -216,7 +217,7 @@ class _SignState extends State<Sign> {
                                       Authentication.chek(
                                               provider, methodprovider)
                                           .then((value) {
-                                        if (!value) {
+                                        if (value) {
                                           methodprovider.changeloading(false);
 
                                           Authentication.verifyPhoneNumber(
@@ -296,12 +297,6 @@ class _SignState extends State<Sign> {
             )),
       ),
     );
-  }
-
-  void signOut() async {
-    //await FirebaseAuth.instance.signOut();
-
-    // Navigate back to the login or home screen
   }
 
   bool _subnmit() {

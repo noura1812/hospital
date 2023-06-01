@@ -14,6 +14,7 @@ class Workingtime extends StatelessWidget {
     {'id': 5, 'name': 'Wednesday'},
     {'id': 6, 'name': 'Thursday'},
   ];
+  final RegExp regExp = RegExp(r'^([01]?[0-9]|2[0-3]):00$');
 
   Workingtime({super.key});
 
@@ -53,8 +54,10 @@ class Workingtime extends StatelessWidget {
                             ?.copyWith(color: Themes.grey, fontSize: 20),
                         key: const ValueKey('start'),
                         validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Pleas enter a valid phone number';
+                          if (value == null ||
+                              value.isEmpty ||
+                              !regExp.hasMatch(value)) {
+                            return 'Pleas enter a valid start hour';
                           }
                           return null;
                         },
@@ -78,6 +81,7 @@ class Workingtime extends StatelessWidget {
                           fillColor: Themes.backgroundColor,
                           filled: true,
                           labelText: 'Start',
+                          hintText: '12:00',
                           labelStyle: Theme.of(context)
                               .textTheme
                               .bodySmall
@@ -105,8 +109,15 @@ class Workingtime extends StatelessWidget {
                             ?.copyWith(color: Themes.grey),
                         key: const ValueKey('End'),
                         validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Pleas enter a valid phone number';
+                          if (value == null ||
+                              value.isEmpty ||
+                              !regExp.hasMatch(value)) {
+                            return 'Pleas enter a valid end hour';
+                          } else if (provider.endpm == provider.startpm) {
+                            if (int.parse(value.split(':')[0]) <
+                                int.parse(provider.starttime.split(':')[0])) {
+                              return 'Pleas enter a valid end hour';
+                            }
                           }
                           return null;
                         },
@@ -130,6 +141,7 @@ class Workingtime extends StatelessWidget {
                           fillColor: Themes.backgroundColor,
                           filled: true,
                           labelText: 'End',
+                          hintText: '12:00',
                           labelStyle: Theme.of(context)
                               .textTheme
                               .bodySmall
