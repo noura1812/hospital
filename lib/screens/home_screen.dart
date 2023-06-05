@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
   static const String routname = 'homescreen';
-  List tabs = [HomeTab()];
+  final List tabs = [HomeTab()];
   int index = 0;
 
   HomeScreen({super.key});
@@ -16,7 +16,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
 
-    var homeTabProvider = Provider.of<HmeTabProviders>(context);
+    var homeTabProvider = Provider.of<HomeTabProviders>(context);
 
     return homeTabProvider.userdata == null
         ? const Scaffold(
@@ -48,7 +48,7 @@ class HomeScreen extends StatelessWidget {
 
                       Navigator.pushReplacementNamed(context, Sign.routname);
                     },
-                    icon: Icon(Icons.logout_sharp)),
+                    icon: const Icon(Icons.logout_sharp)),
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: CircleAvatar(

@@ -1,13 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hospital/model/doctors.dart';
 import 'package:hospital/model/pationtmodel.dart';
-import 'package:hospital/providers/signproviders.dart';
+import 'package:hospital/providers/hometabProviders.dart';
+import 'package:hospital/providers/signProviders.dart';
 import 'package:hospital/services/firebase/firebase_main_functions.dart';
 import 'package:hospital/widgets/toast.dart';
 
 class Authentication {
   static Future<void> verifyPhoneNumber(
-      provider, signprividers methodprovider, Function goHome) async {
+      provider, Signprividers methodprovider, Function goHome) async {
     FirebaseAuth auth = FirebaseAuth.instance;
     auth.verifyPhoneNumber(
       timeout: const Duration(seconds: 60),
@@ -40,9 +41,9 @@ class Authentication {
 
   void signin(
       //get users data
-      signprividers methodprovider,
-      signprividers provider,
-      homeTabProviderMethods,
+      Signprividers methodprovider,
+      Signprividers provider,
+      HomeTabProviders homeTabProviderMethods,
       Function goHome) async {
     final doctorsdata =
         await FirebaseMainFunctions.searchForADoctors(provider.phone);
@@ -56,11 +57,14 @@ class Authentication {
         DoctorsModel doctorsModel = doctorsdata.docs[0].data();
         methodprovider.changeisadoctor(true);
         methodprovider.getdoctorsdata(doctorsModel);
+        homeTabProviderMethods.setIsdoctor(true);
         homeTabProviderMethods.setUserData(doctorsModel);
       } else {
         PationtModel pationtModel = pationtssdata.docs[0].data();
         methodprovider.changeisadoctor(false);
         methodprovider.getPationtsData(pationtModel);
+        homeTabProviderMethods.setIsdoctor(false);
+
         homeTabProviderMethods.setUserData(pationtModel);
       }
 
@@ -74,8 +78,7 @@ class Authentication {
     }
   }
 
-  static Future<bool> chek(signprividers provider, methodprovider) async {
-    print(provider.phone);
+  static Future<bool> chek(Signprividers provider, methodprovider) async {
     final doctorsdata =
         await FirebaseMainFunctions.searchForADoctors(provider.phone);
 

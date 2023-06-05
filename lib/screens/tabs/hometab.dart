@@ -7,19 +7,19 @@ import 'package:hospital/screens/search_by_speciality.dart';
 import 'package:hospital/services/firebase/firebase_main_functions.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
-import 'package:hospital/widgets/doctorsLongCard.dart';
+import 'package:hospital/widgets/doctors_long_card.dart';
 import 'package:provider/provider.dart';
 
 class HomeTab extends StatelessWidget {
   HomeTab({super.key});
 
-  TextEditingController searchController = TextEditingController();
-  var focusNode = FocusNode();
+  final TextEditingController searchController = TextEditingController();
+  final FocusNode focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    var homeTabProvider = Provider.of<HmeTabProviders>(context);
+    var homeTabProvider = Provider.of<HomeTabProviders>(context);
     return Padding(
       padding: EdgeInsets.all(getProportionateScreenWidth(15)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
@@ -146,7 +146,7 @@ class HomeTab extends StatelessWidget {
     FieldsModel e,
     BuildContext context,
   ) {
-    var homeTabMethods = Provider.of<HmeTabProviders>(context, listen: false);
+    var homeTabMethods = Provider.of<HomeTabProviders>(context, listen: false);
 
     return Expanded(
       flex: e.selected ? 9 : 5,

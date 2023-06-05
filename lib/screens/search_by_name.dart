@@ -4,13 +4,13 @@ import 'package:hospital/providers/hometabProviders.dart';
 import 'package:hospital/services/firebase/firebase_main_functions.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
-import 'package:hospital/widgets/doctorsLongCard.dart';
+import 'package:hospital/widgets/doctors_long_card.dart';
 import 'package:provider/provider.dart';
 
 class SearchByName extends StatefulWidget {
   static const String routname = 'Search by name ';
 
-  SearchByName({super.key});
+  const SearchByName({super.key});
 
   @override
   State<SearchByName> createState() => _SearchByNameState();
@@ -23,7 +23,7 @@ class _SearchByNameState extends State<SearchByName> {
 
   @override
   Widget build(BuildContext context) {
-    var homeTabProvider = Provider.of<HmeTabProviders>(context);
+    var homeTabProvider = Provider.of<HomeTabProviders>(context);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,

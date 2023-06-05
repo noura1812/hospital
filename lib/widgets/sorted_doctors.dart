@@ -4,11 +4,11 @@ import 'package:hospital/providers/hometabProviders.dart';
 import 'package:hospital/services/firebase/firebase_main_functions.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
-import 'package:hospital/widgets/doctorsLongCard.dart';
+import 'package:hospital/widgets/doctors_long_card.dart';
 import 'package:provider/provider.dart';
 
 class SortedDoctors extends StatefulWidget {
-  SortedDoctors({super.key});
+  const SortedDoctors({super.key});
 
   @override
   State<SortedDoctors> createState() => _SortedDoctorsState();
@@ -26,8 +26,8 @@ class _SortedDoctorsState extends State<SortedDoctors> {
 
   @override
   Widget build(BuildContext context) {
-    var homeTabProvider = Provider.of<HmeTabProviders>(context);
-    var homeTabMethods = Provider.of<HmeTabProviders>(context, listen: false);
+    var homeTabProvider = Provider.of<HomeTabProviders>(context);
+    var homeTabMethods = Provider.of<HomeTabProviders>(context, listen: false);
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,12 +103,14 @@ class _SortedDoctorsState extends State<SortedDoctors> {
 
   int getTotalStars(DoctorsModel doctor) {
     int sum = 0;
-    doctor.reviews.forEach((review) => sum += review.numstars);
+    for (var review in doctor.reviews) {
+      sum += review.numstars;
+    }
     return sum;
   }
 
-  dropdownSort(context, HmeTabProviders methodprovider) {
-    return Consumer<HmeTabProviders>(
+  dropdownSort(context, HomeTabProviders methodprovider) {
+    return Consumer<HomeTabProviders>(
       builder: (context, value, child) {
         return DropdownButton<String>(
           underline: const SizedBox(),

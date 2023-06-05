@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hospital/providers/signproviders.dart';
+import 'package:hospital/providers/signProviders.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
 import 'package:provider/provider.dart';
@@ -20,8 +20,8 @@ class Workingtime extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var provider = Provider.of<signprividers>(context);
-    var methodprovider = Provider.of<signprividers>(context, listen: false);
+    var provider = Provider.of<Signprividers>(context);
+    var methodprovider = Provider.of<Signprividers>(context, listen: false);
 
     return Stack(
       children: [
@@ -250,10 +250,10 @@ class Workingtime extends StatelessWidget {
                   MultiSelectItem(option['id'], option['name'].toString()))
               .toList(),
           onConfirm: (results) {
-            Provider.of<signprividers>(context, listen: false)
+            Provider.of<Signprividers>(context, listen: false)
                 .setdayvalue(results);
           },
-          initialValue: Provider.of<signprividers>(context).days,
+          initialValue: Provider.of<Signprividers>(context).days,
         );
       },
     );

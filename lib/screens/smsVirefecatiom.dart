@@ -2,9 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_verification_code/flutter_verification_code.dart';
 import 'package:hospital/providers/hometabProviders.dart';
-import 'package:hospital/screens/homescreen.dart';
+import 'package:hospital/screens/home_screen.dart';
 import 'package:hospital/services/firebase/authentication.dart';
-import 'package:hospital/providers/signproviders.dart';
+import 'package:hospital/providers/signProviders.dart';
 import 'package:hospital/services/firebase/firebase_main_functions.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
@@ -74,9 +74,9 @@ class _SmsVerificationState extends State<SmsVerification> {
     SizeConfig().init(context);
 
 //    sendAgainVerify();
-    var provider = Provider.of<signprividers>(context);
-    var methodprovider = Provider.of<signprividers>(context, listen: false);
-    var homeTabMethods = Provider.of<HmeTabProviders>(context, listen: false);
+    var provider = Provider.of<Signprividers>(context);
+    var methodprovider = Provider.of<Signprividers>(context, listen: false);
+    var homeTabMethods = Provider.of<HomeTabProviders>(context, listen: false);
     FirebaseAuth auth = FirebaseAuth.instance;
     verefied = provider.verified;
     String url = '';
@@ -243,9 +243,9 @@ class _SmsVerificationState extends State<SmsVerification> {
 
   addUser(
       FirebaseAuth auth,
-      signprividers provider,
-      signprividers methodprovider,
-      HmeTabProviders homeTabMethods,
+      Signprividers provider,
+      Signprividers methodprovider,
+      HomeTabProviders homeTabMethods,
       message,
       url) async {
     try {
@@ -304,7 +304,7 @@ class _SmsVerificationState extends State<SmsVerification> {
     }
   }
 
-  login(FirebaseAuth auth, signprividers provider, signprividers methodprovider,
+  login(FirebaseAuth auth, Signprividers provider, Signprividers methodprovider,
       homeTabMethods, message, url) async {
     try {
       final userCredential = await auth.signInWithCredential(

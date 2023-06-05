@@ -1,14 +1,13 @@
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:hospital/providers/signproviders.dart';
-import 'package:hospital/screens/homescreen.dart';
+import 'package:hospital/providers/signProviders.dart';
+import 'package:hospital/screens/home_screen.dart';
 import 'package:hospital/screens/smsVirefecatiom.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
 import 'package:hospital/services/firebase/authentication.dart';
-import 'package:hospital/widgets/enterdoctorsdata.dart';
+import 'package:hospital/widgets/enter_doctors_data.dart';
 import 'package:hospital/widgets/toast.dart';
 import 'package:hospital/widgets/user_imagepicker.dart';
 import 'package:provider/provider.dart';
@@ -40,8 +39,8 @@ class _SignState extends State<Sign> {
 
   @override
   Widget build(BuildContext context) {
-    var provider = Provider.of<signprividers>(context);
-    var methodprovider = Provider.of<signprividers>(context, listen: false);
+    var provider = Provider.of<Signprividers>(context);
+    var methodprovider = Provider.of<Signprividers>(context, listen: false);
 
     SizeConfig().init(context);
 
@@ -327,9 +326,9 @@ class _SignState extends State<Sign> {
           fillColor: MaterialStateProperty.all<Color>(Themes.lightblue),
           value: val,
           groupValue:
-              Provider.of<signprividers>(context, listen: false).isadoctor,
+              Provider.of<Signprividers>(context, listen: false).isadoctor,
           onChanged: (value) {
-            Provider.of<signprividers>(context, listen: false)
+            Provider.of<Signprividers>(context, listen: false)
                 .changeisadoctor(value!);
           },
         ),

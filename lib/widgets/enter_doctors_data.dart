@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hospital/providers/signproviders.dart';
+import 'package:hospital/providers/signProviders.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
-import 'package:hospital/widgets/workingtime.dart';
+import 'package:hospital/widgets/working_time.dart';
 import 'package:provider/provider.dart';
 
 class EnterDocsData extends StatelessWidget {
@@ -18,8 +18,8 @@ class EnterDocsData extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var provider = Provider.of<signprividers>(context);
-    var methodprovider = Provider.of<signprividers>(context, listen: false);
+    var provider = Provider.of<Signprividers>(context);
+    var methodprovider = Provider.of<Signprividers>(context, listen: false);
 
     return Column(children: [
       DropdownButtonFormField(

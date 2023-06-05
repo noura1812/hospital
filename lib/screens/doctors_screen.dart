@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:hospital/model/appointment.dart';
 import 'package:hospital/model/doctors.dart';
 import 'package:hospital/providers/hometabProviders.dart';
-import 'package:hospital/screens/booking_creen.dart';
+import 'package:hospital/screens/booking_screen.dart';
+import 'package:hospital/services/firebase/firebase_main_functions.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
+import 'package:hospital/widgets/appointment_card.dart';
 import 'package:hospital/widgets/reviews_list.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -13,7 +15,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 class DoctorsScreen extends StatefulWidget {
   static const String routname = 'Doctors screen ';
 
-  DoctorsScreen({super.key});
+  const DoctorsScreen({super.key});
 
   @override
   State<DoctorsScreen> createState() => _DoctorsScreenState();
@@ -24,14 +26,16 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var homeTabProvider = Provider.of<HmeTabProviders>(context);
+    var homeTabProvider = Provider.of<HomeTabProviders>(context);
     bool isDoctorFound = false;
+    Appointment? currentAppointment;
     double stars = 0;
 
     DoctorsModel doctorsModel =
         ModalRoute.of(context)!.settings.arguments as DoctorsModel;
     for (Appointment appointment in homeTabProvider.userdata.appointments) {
       if (appointment.doctorsID == doctorsModel.id) {
+        currentAppointment = appointment;
         isDoctorFound = true;
         break;
       }
@@ -40,6 +44,19 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
       stars += review.numstars;
     }
     stars = stars / doctorsModel.reviews.length;
+    void cancelAppointment() {
+      homeTabProvider.deleteUserAppointment(currentAppointment!.id);
+      FirebaseMainFunctions.cancelAppointment(
+          homeTabProvider.userdata, doctorsModel, currentAppointment.id);
+    }
+
+    void editAppointment() {
+      homeTabProvider.setEditAppointment(currentAppointment);
+
+      Navigator.pushNamed(context, BookingScreen.routname,
+          arguments: doctorsModel);
+    }
+
     return Scaffold(
         backgroundColor: Themes.lighbackgroundColor,
         appBar: AppBar(
@@ -130,35 +147,39 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
               )
             ]),
           ),
-          homeTabProvider.userdata.id == doctorsModel.id
+          homeTabProvider.isdoctor
               ? Container()
-              : Container(
-                  height: SizeConfig.screenHeight * .06,
-                  width: SizeConfig.screenWidth * .5,
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, BookingScreen.routname,
-                          arguments: doctorsModel);
-                      //move to boking screen
-                    },
-                    style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
+              : isDoctorFound
+                  ? Container() //ways of comunication
+                  : Container(
+                      height: SizeConfig.screenHeight * .06,
+                      width: SizeConfig.screenWidth * .5,
+                      margin: const EdgeInsets.symmetric(vertical: 10),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, BookingScreen.routname,
+                              arguments: doctorsModel);
+                          //move to boking screen
+                        },
+                        style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            backgroundColor: Themes.blue),
+                        child: Text(
+                          'Book apointment',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 15),
                         ),
-                        backgroundColor: Themes.blue),
-                    child: Text(
-                      'Book apointment',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15),
+                      ),
                     ),
-                  ),
-                ),
-          isDoctorFound
-              ? Container() //should be the appontment date
-              : Container(
+          homeTabProvider.isdoctor || currentAppointment == null
+              ? Container(
                   margin: const EdgeInsets.all(5),
                   padding:
                       const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
@@ -202,7 +223,11 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                       )
                     ],
                   ),
-                ),
+                )
+              : AppointmentCard(
+                  editAppointment: editAppointment,
+                  cancelAppointment: cancelAppointment,
+                  currentAppointment: currentAppointment),
           Expanded(
             child: Container(
               width: double.infinity,
@@ -375,7 +400,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
               end = 'Fri';
             }
 
-            return '$start-$end';
+            return '$start to $end';
           }
         }
       }

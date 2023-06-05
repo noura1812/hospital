@@ -1,15 +1,16 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hospital/model/appointment.dart';
 
 import 'package:hospital/model/fieldsmodel.dart';
 import 'package:hospital/services/firebase/firebase_main_functions.dart';
 
-class HmeTabProviders with ChangeNotifier {
+class HomeTabProviders with ChangeNotifier {
   var userdata;
-
+  bool isdoctor = false;
   User? firebaseUser;
-
+  Appointment? editAppointment;
   List<FieldsModel> fields = [
     FieldsModel(
       name: 'Ophthalmology',
@@ -35,7 +36,7 @@ class HmeTabProviders with ChangeNotifier {
         icon: ('assets/images/tooth icon.png')),
   ];
   String speciality = '';
-  HmeTabProviders() {
+  HomeTabProviders() {
     firebaseUser = FirebaseAuth.instance.currentUser;
     if (firebaseUser != null) {
       chekUser();
@@ -47,11 +48,28 @@ class HmeTabProviders with ChangeNotifier {
         await FirebaseMainFunctions.getPationtsById(firebaseUser!.uid);
     if (doctor.exists) {
       userdata = doctor.data()!;
+      isdoctor = true;
       notifyListeners();
     } else if (pationt.exists) {
       userdata = pationt.data()!;
+      isdoctor = false;
       notifyListeners();
     }
+  }
+
+  setEditAppointment(value) {
+    editAppointment = value;
+    notifyListeners();
+  }
+
+  adduserAppointment(Appointment appointment) {
+    userdata.appointments.add(appointment);
+    notifyListeners();
+  }
+
+  deleteUserAppointment(id) {
+    userdata.appointments.removeWhere((element) => element.id == id);
+    notifyListeners();
   }
 
   changeSpeciality(String value) {
@@ -61,6 +79,11 @@ class HmeTabProviders with ChangeNotifier {
 
   setUserData(value) {
     userdata = value;
+    notifyListeners();
+  }
+
+  setIsdoctor(bool value) {
+    isdoctor = value;
     notifyListeners();
   }
 

@@ -14,8 +14,8 @@ class SearchBySpecialityScreen extends StatelessWidget {
   const SearchBySpecialityScreen({super.key});
   @override
   Widget build(BuildContext context) {
-    var homeTabProvider = Provider.of<HmeTabProviders>(context);
-    var homeTabMethods = Provider.of<HmeTabProviders>(context, listen: false);
+    var homeTabProvider = Provider.of<HomeTabProviders>(context);
+    var homeTabMethods = Provider.of<HomeTabProviders>(context, listen: false);
     return WillPopScope(
       onWillPop: () {
         homeTabMethods.changeSpeciality('');
@@ -115,7 +115,7 @@ class SearchBySpecialityScreen extends StatelessWidget {
                             },
                           ),
                         ),
-                        SortedDoctors(),
+                        const SortedDoctors(),
                       ],
                     ),
                   );
@@ -134,7 +134,7 @@ class SearchBySpecialityScreen extends StatelessWidget {
     FieldsModel e,
     BuildContext context,
   ) {
-    var homeTabMethods = Provider.of<HmeTabProviders>(context, listen: false);
+    var homeTabMethods = Provider.of<HomeTabProviders>(context, listen: false);
 
     return Expanded(
       flex: e.selected ? 9 : 5,

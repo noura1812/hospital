@@ -52,14 +52,10 @@ class FirebaseMainFunctions {
   }
 
   static Future<void> updateDoctors(DoctorsModel doctorsModel) {
-    return getDoctorsCollection()
-        .doc(doctorsModel.id)
-        .update({
-          'appointments': List<dynamic>.from(doctorsModel.appointments
-              .map((appointment) => appointment.toJson()))
-        })
-        .then((value) => print("User Updated"))
-        .catchError((error) => print("Failed to update user: $error"));
+    return getDoctorsCollection().doc(doctorsModel.id).update({
+      'appointments': List<dynamic>.from(
+          doctorsModel.appointments.map((appointment) => appointment.toJson()))
+    });
   }
 /////////////////////////////////////////////////////////////////////////////////////
 
@@ -108,13 +104,20 @@ class FirebaseMainFunctions {
   }
 
   static Future<void> updatePationt(PationtModel pationtModel) {
-    return getPationtsCollection()
-        .doc(pationtModel.id)
-        .update({
-          'appointments': List<dynamic>.from(pationtModel.appointments
-              .map((appointment) => appointment.toJson()))
-        })
-        .then((value) => print("User Updated"))
-        .catchError((error) => print("Failed to update user: $error"));
+    return getPationtsCollection().doc(pationtModel.id).update({
+      'appointments': List<dynamic>.from(
+          pationtModel.appointments.map((appointment) => appointment.toJson()))
+    });
+  }
+////////////////////////////////////////
+
+  static Future<void> cancelAppointment(PationtModel pationtModel,
+      DoctorsModel doctorsModel, String appointmentid) {
+    pationtModel.appointments
+        .removeWhere((element) => element.id == appointmentid);
+    doctorsModel.appointments
+        .removeWhere((element) => element.id == appointmentid);
+    updatePationt(pationtModel);
+    return updateDoctors(doctorsModel);
   }
 }
