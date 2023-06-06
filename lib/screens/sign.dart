@@ -1,19 +1,19 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:hospital/providers/signProviders.dart';
+import 'package:hospital/providers/sign_providers.dart';
 import 'package:hospital/screens/home_screen.dart';
-import 'package:hospital/screens/smsVirefecatiom.dart';
+import 'package:hospital/screens/sms_verification_screen.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
 import 'package:hospital/services/firebase/authentication.dart';
 import 'package:hospital/widgets/enter_doctors_data.dart';
 import 'package:hospital/widgets/toast.dart';
-import 'package:hospital/widgets/user_imagepicker.dart';
+import 'package:hospital/widgets/user_image_picker.dart';
 import 'package:provider/provider.dart';
 
 class Sign extends StatefulWidget {
-  static const String routname = 'sign';
+  static const String routName = 'sign';
 
   const Sign({super.key});
 
@@ -34,18 +34,18 @@ class _SignState extends State<Sign> {
 
   File? imageFile;
   void goHome() {
-    Navigator.pushReplacementNamed(context, HomeScreen.routname);
+    Navigator.pushReplacementNamed(context, HomeScreen.routName);
   }
 
   @override
   Widget build(BuildContext context) {
-    var provider = Provider.of<Signprividers>(context);
-    var methodprovider = Provider.of<Signprividers>(context, listen: false);
+    var provider = Provider.of<SignProvider>(context);
+    var methodProvider = Provider.of<SignProvider>(context, listen: false);
 
     SizeConfig().init(context);
 
     return Scaffold(
-      backgroundColor: Themes.lighbackgroundColor,
+      backgroundColor: Themes.lightBackgroundColor,
       body: SingleChildScrollView(
         child: Container(
             padding: EdgeInsets.only(
@@ -65,14 +65,14 @@ class _SignState extends State<Sign> {
                         padding: EdgeInsets.only(
                             bottom: getProportionateScreenHeight(50)),
                         child: Text(
-                          provider.islogin ? 'Sign in' : 'Sign up',
+                          provider.isLogin ? 'Sign in' : 'Sign up',
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                       ),
-                      if (!provider.islogin)
-                        UserImagePicker(methodprovider.pickedImage),
-                      if (!provider.islogin)
+                      if (!provider.isLogin)
+                        UserImagePicker(methodProvider.pickedImage),
+                      if (!provider.isLogin)
                         Container(
                           height: SizeConfig.screenHeight * .08,
                           margin: EdgeInsets.only(
@@ -91,7 +91,7 @@ class _SignState extends State<Sign> {
                               return null;
                             },
                             onSaved: ((newValue) =>
-                                methodprovider.changname(newValue!)),
+                                methodProvider.changName(newValue!)),
                             keyboardType: TextInputType.text,
                             decoration: InputDecoration(
                               errorStyle: Theme.of(context)
@@ -131,7 +131,7 @@ class _SignState extends State<Sign> {
                             return null;
                           },
                           onSaved: ((newValue) =>
-                              methodprovider.changphone(newValue!)),
+                              methodProvider.changPhone(newValue!)),
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
                             errorStyle: Theme.of(context)
@@ -159,15 +159,15 @@ class _SignState extends State<Sign> {
                           ),
                         ),
                       ),
-                      if (!provider.islogin)
+                      if (!provider.isLogin)
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            radiobutton('Patient', false),
-                            radiobutton('Doctor', true),
+                            radioButton('Patient', false),
+                            radioButton('Doctor', true),
                           ],
                         ),
-                      if (provider.isadoctor && !provider.islogin)
+                      if (provider.isaDoctor && !provider.isLogin)
                         EnterDocsData(),
                     ]),
                   ),
@@ -181,54 +181,51 @@ class _SignState extends State<Sign> {
                           onPressed: provider.loading
                               ? null
                               : () {
-                                  //  loadding(true);
-
-                                  methodprovider.changeloading(true);
-                                  bool validate = _subnmit();
+                                  methodProvider.changeLoading(true);
+                                  bool validate = _submit();
                                   if (validate == true) {
-                                    methodprovider.setdoctorsdata();
+                                    methodProvider.setDoctorsData();
                                     if (provider.days.isEmpty &&
-                                        !provider.islogin &&
-                                        provider.isadoctor) {
-                                      ToastMessage.toastmessage(
+                                        !provider.isLogin &&
+                                        provider.isaDoctor) {
+                                      ToastMessage.toastMessage(
                                           'Select your working days!', true);
-                                      methodprovider.changeloading(false);
+                                      methodProvider.changeLoading(false);
                                       return;
                                     }
-                                    if (!provider.islogin) {
-                                      Authentication.chek(
-                                              provider, methodprovider)
+                                    if (!provider.isLogin) {
+                                      Authentication.chick(
+                                              provider, methodProvider)
                                           .then((value) {
                                         if (value) {
                                           Authentication.verifyPhoneNumber(
                                                   provider,
-                                                  methodprovider,
+                                                  methodProvider,
                                                   goHome)
                                               .then((value) {
-                                            methodprovider.changeloading(false);
+                                            methodProvider.changeLoading(false);
 
                                             return Navigator.pushNamed(context,
-                                                SmsVerification.routname);
+                                                SmsVerification.routName);
                                           });
                                         }
                                       });
                                     } else {
-                                      Authentication.chek(
-                                              provider, methodprovider)
+                                      Authentication.chick(
+                                              provider, methodProvider)
                                           .then((value) {
                                         if (value) {
-                                          methodprovider.changeloading(false);
+                                          methodProvider.changeLoading(false);
 
                                           Authentication.verifyPhoneNumber(
-                                              provider, methodprovider, goHome);
+                                              provider, methodProvider, goHome);
                                           Navigator.pushNamed(context,
-                                              SmsVerification.routname);
+                                              SmsVerification.routName);
                                         }
                                       });
                                     }
                                   } else {
-                                    // loadding(false);
-                                    methodprovider.changeloading(false);
+                                    methodProvider.changeLoading(false);
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
@@ -246,7 +243,7 @@ class _SignState extends State<Sign> {
                                   ),
                                 )
                               : Text(
-                                  provider.islogin ? 'Sign in' : "Sign up",
+                                  provider.isLogin ? 'Sign in' : "Sign up",
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodySmall
@@ -263,7 +260,7 @@ class _SignState extends State<Sign> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            provider.islogin
+                            provider.isLogin
                                 ? "Don't have an account?"
                                 : "Have an account?",
                             style: Theme.of(context)
@@ -275,15 +272,15 @@ class _SignState extends State<Sign> {
                           ),
                           InkWell(
                             onTap: () {
-                              methodprovider.changeislogin(!provider.islogin);
+                              methodProvider.changeIsLogin(!provider.isLogin);
                             },
                             child: Text(
-                              provider.islogin ? " Sign up " : "Sign in",
+                              provider.isLogin ? " Sign up " : "Sign in",
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall
                                   ?.copyWith(
-                                      color: Themes.textcolor,
+                                      color: Themes.textColor,
                                       fontWeight: FontWeight.w500),
                             ),
                           ),
@@ -298,11 +295,11 @@ class _SignState extends State<Sign> {
     );
   }
 
-  bool _subnmit() {
-    final isvalid = _formKey.currentState!.validate();
+  bool _submit() {
+    final isValid = _formKey.currentState!.validate();
     FocusScope.of(context).unfocus();
 
-    if (isvalid) {
+    if (isValid) {
       _formKey.currentState!.save();
       return true;
     } else {
@@ -310,7 +307,7 @@ class _SignState extends State<Sign> {
     }
   }
 
-  radiobutton(String title, bool val) {
+  radioButton(String title, bool val) {
     return Expanded(
       child: ListTile(
         contentPadding: const EdgeInsets.all(0),
@@ -326,10 +323,10 @@ class _SignState extends State<Sign> {
           fillColor: MaterialStateProperty.all<Color>(Themes.lightblue),
           value: val,
           groupValue:
-              Provider.of<Signprividers>(context, listen: false).isadoctor,
+              Provider.of<SignProvider>(context, listen: false).isaDoctor,
           onChanged: (value) {
-            Provider.of<Signprividers>(context, listen: false)
-                .changeisadoctor(value!);
+            Provider.of<SignProvider>(context, listen: false)
+                .changeIsaDoctor(value!);
           },
         ),
       ),

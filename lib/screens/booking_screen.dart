@@ -4,13 +4,13 @@ import 'package:hospital/model/doctors.dart';
 import 'package:date_picker_timeline/date_picker_timeline.dart';
 import 'package:hospital/services/firebase/firebase_main_functions.dart';
 import 'package:intl/intl.dart';
-import 'package:hospital/providers/hometabProviders.dart';
+import 'package:hospital/providers/home_tab_providers.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
 import 'package:provider/provider.dart';
 
 class BookingScreen extends StatefulWidget {
-  static const String routname = 'booking screen';
+  static const String routName = 'booking screen';
 
   const BookingScreen({super.key});
 
@@ -19,30 +19,32 @@ class BookingScreen extends StatefulWidget {
 }
 
 class _BookingScreenState extends State<BookingScreen> {
-  List<DateTime> wDays = [];
   final _formKey = GlobalKey<FormState>();
-
+  bool edit = false;
   DateTime selectedValue = DateTime.now();
   TextEditingController symptoms = TextEditingController();
+  List<DateTime> wDays = [];
   List<String> wHours = [];
   int selectedHour = 0;
+  late HomeTabProviders htProvider;
   @override
   Widget build(BuildContext context) {
     var homeTabProvider = Provider.of<HomeTabProviders>(context);
-
-    symptoms.text = homeTabProvider.editAppointment != null
-        ? homeTabProvider.editAppointment!.complains
-        : '';
+    htProvider = homeTabProvider;
+    edit = homeTabProvider.editAppointment != null ? true : false;
+    symptoms.text = edit ? homeTabProvider.editAppointment!.complains : '';
     DoctorsModel doctorsModel =
         ModalRoute.of(context)!.settings.arguments as DoctorsModel;
     if (wDays.isEmpty) {
-      wDays = workingDays(doctorsModel.workinghours.days);
+      wDays = workingDays(doctorsModel.workingHours.days);
       selectedValue = wDays[0];
     }
     if (wHours.isEmpty) {
-      wHours = workingHours(doctorsModel.workinghours.starthour,
-          doctorsModel.workinghours.endhour);
-      String hours = homeTabProvider.editAppointment != null
+      wHours = workingHours(
+          doctorsModel.appointments,
+          doctorsModel.workingHours.startHour,
+          doctorsModel.workingHours.endHour);
+      String hours = edit
           ? DateFormat('hh:mm a').format((DateTime.fromMillisecondsSinceEpoch(
               homeTabProvider.editAppointment!.date)))
           : '';
@@ -55,7 +57,7 @@ class _BookingScreenState extends State<BookingScreen> {
         return Future.value(true);
       },
       child: Scaffold(
-        backgroundColor: Themes.lighbackgroundColor,
+        backgroundColor: Themes.lightBackgroundColor,
         appBar: AppBar(
             centerTitle: true,
             leading: IconButton(
@@ -86,7 +88,7 @@ class _BookingScreenState extends State<BookingScreen> {
                 DatePicker(
                   daysCount: 356,
                   DateTime.now(),
-                  initialSelectedDate: homeTabProvider.editAppointment != null
+                  initialSelectedDate: edit
                       ? DateTime.fromMillisecondsSinceEpoch(
                           homeTabProvider.editAppointment!.date)
                       : wDays.isNotEmpty
@@ -107,10 +109,14 @@ class _BookingScreenState extends State<BookingScreen> {
                       .textTheme
                       .bodySmall!
                       .copyWith(fontSize: 15),
-                  activeDates: workingDays(doctorsModel.workinghours.days),
+                  activeDates: workingDays(doctorsModel.workingHours.days),
                   height: 100,
                   onDateChange: (selectedDate) {
                     selectedValue = selectedDate;
+                    wHours = workingHours(
+                        doctorsModel.appointments,
+                        doctorsModel.workingHours.startHour,
+                        doctorsModel.workingHours.endHour);
                     setState(() {});
                   },
                 ),
@@ -205,7 +211,7 @@ class _BookingScreenState extends State<BookingScreen> {
                                   .copyWith(
                                       color: index == selectedHour
                                           ? Colors.white
-                                          : Themes.textcolor,
+                                          : Themes.textColor,
                                       fontSize: 17,
                                       fontWeight: FontWeight.w400),
                             ),
@@ -223,31 +229,31 @@ class _BookingScreenState extends State<BookingScreen> {
                       top: 20, bottom: 30, right: 30, left: 30),
                   child: ElevatedButton(
                     onPressed: () {
-                      bool validate = _subnmit();
+                      bool validate = _submit();
                       if (validate) {
-                        if (homeTabProvider.editAppointment != null) {
+                        if (edit) {
                           homeTabProvider.deleteUserAppointment(
                               homeTabProvider.editAppointment!.id);
                           FirebaseMainFunctions.cancelAppointment(
-                              homeTabProvider.userdata,
+                              homeTabProvider.userData,
                               doctorsModel,
                               homeTabProvider.editAppointment!.id);
                           homeTabProvider.setEditAppointment(null);
                         }
                         Appointment appointment = Appointment(
                             id:
-                                '${homeTabProvider.userdata.id}${doctorsModel.id}',
-                            pationtsID: homeTabProvider.userdata.id,
+                                '${homeTabProvider.userData.id}${doctorsModel.id}',
+                            patientsID: homeTabProvider.userData.id,
                             doctorsID: doctorsModel.id,
                             date: DateFormat('yyyy-MM-dd hh:mm a')
                                 .parse(
                                     '${selectedValue.toString().substring(0, 10)} ${wHours[selectedHour]}')
                                 .millisecondsSinceEpoch,
                             complains: symptoms.text);
-                        homeTabProvider.adduserAppointment(appointment);
+                        homeTabProvider.addUserAppointment(appointment);
                         doctorsModel.appointments.add(appointment);
-                        FirebaseMainFunctions.updatePationt(
-                            homeTabProvider.userdata);
+                        FirebaseMainFunctions.updatePatient(
+                            homeTabProvider.userData);
                         FirebaseMainFunctions.updateDoctors(doctorsModel);
                         Navigator.pop(context);
                       }
@@ -258,9 +264,7 @@ class _BookingScreenState extends State<BookingScreen> {
                         ),
                         backgroundColor: Theme.of(context).primaryColor),
                     child: Text(
-                      homeTabProvider.editAppointment != null
-                          ? 'Edit Appointment'
-                          : 'Book Appointment',
+                      edit ? 'Edit Appointment' : 'Book Appointment',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Colors.white, fontWeight: FontWeight.w500),
                     ),
@@ -274,12 +278,27 @@ class _BookingScreenState extends State<BookingScreen> {
     );
   }
 
-  List<String> workingHours(String start, String end) {
+  List<String> workingHours(
+      List<Appointment> appointments, String start, String end) {
     String startDayTime = start.split(' ')[1];
     String endDayTime = end.split(' ')[1];
     int startHour = 0;
     int hours = 0;
     List<String> finalHours = [];
+
+    List<Appointment> todaysAppointments = appointments
+        .where((element) =>
+            DateTime.fromMillisecondsSinceEpoch(element.date).month ==
+                selectedValue.month &&
+            DateTime.fromMillisecondsSinceEpoch(element.date).day ==
+                selectedValue.day)
+        .toList();
+    List<String> invalidHours = [];
+    for (var i = 0; i < todaysAppointments.length; i++) {
+      invalidHours.add(DateFormat('hh:mm a').format(
+          (DateTime.fromMillisecondsSinceEpoch(todaysAppointments[i].date))));
+    }
+
     if (startDayTime == endDayTime) {
       hours = int.parse(end.split(':')[0]) - int.parse(start.split(':')[0]);
       startHour = int.parse(start.split(':')[0]);
@@ -290,6 +309,12 @@ class _BookingScreenState extends State<BookingScreen> {
           finalHours.add('${startHour + i}:00 $startDayTime');
         }
       }
+      if (edit) {
+        invalidHours.remove(DateFormat('hh:mm a').format(
+            (DateTime.fromMillisecondsSinceEpoch(
+                htProvider.editAppointment!.date))));
+      }
+      finalHours.removeWhere((element) => invalidHours.contains(element));
       return finalHours;
     } else {
       hours = 12 - int.parse(start.split(':')[0]);
@@ -309,15 +334,22 @@ class _BookingScreenState extends State<BookingScreen> {
         }
         counter++;
       }
+      if (edit) {
+        invalidHours.remove(DateFormat('hh:mm a').format(
+            (DateTime.fromMillisecondsSinceEpoch(
+                htProvider.editAppointment!.date))));
+      }
+      finalHours.removeWhere((element) => invalidHours.contains(element));
+
       return finalHours;
     }
   }
 
-  bool _subnmit() {
-    final isvalid = _formKey.currentState!.validate();
+  bool _submit() {
+    final isValid = _formKey.currentState!.validate();
     FocusScope.of(context).unfocus();
 
-    if (isvalid) {
+    if (isValid) {
       _formKey.currentState!.save();
       return true;
     } else {
@@ -351,13 +383,13 @@ class _BookingScreenState extends State<BookingScreen> {
       if (days[i] == 6) {
         day = DateTime.thursday;
       }
-      List<DateTime> sublist = List.generate(
+      List<DateTime> subList = List.generate(
               lastDayOfYear.difference(firstDayOfYear).inDays + 1,
               (index) => firstDayOfYear.add(Duration(days: index)))
           .where((date) => date.weekday == day)
           .toList();
 
-      validDays.addAll(sublist);
+      validDays.addAll(subList);
     }
     validDays.sort((a, b) => a.compareTo(b));
 

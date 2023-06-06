@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hospital/model/reviewmodel.dart';
+import 'package:hospital/model/review_model.dart';
 import 'package:hospital/theme.dart';
 
 class ReviewsList extends StatefulWidget {
-  Reviewsmodel reviewsmodel;
-  ReviewsList({required this.reviewsmodel, super.key});
+  final ReviewsModel reviewsModel;
+  const ReviewsList({required this.reviewsModel, super.key});
 
   @override
   State<ReviewsList> createState() => _ReviewsListState();
@@ -19,7 +19,7 @@ class _ReviewsListState extends State<ReviewsList> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
-          widget.reviewsmodel.name,
+          widget.reviewsModel.name,
           style: Theme.of(context)
               .textTheme
               .bodySmall!
@@ -32,7 +32,7 @@ class _ReviewsListState extends State<ReviewsList> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(5, (index) {
             return Icon(
-              index < widget.reviewsmodel.numstars
+              index < widget.reviewsModel.numStars
                   ? Icons.star
                   : Icons.star_border,
               color: Colors.yellow,
@@ -51,7 +51,7 @@ class _ReviewsListState extends State<ReviewsList> {
           child: Column(
             children: [
               Text(
-                widget.reviewsmodel.review,
+                widget.reviewsModel.review,
                 maxLines: _showFullText ? null : 2,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.bodySmall!.copyWith(

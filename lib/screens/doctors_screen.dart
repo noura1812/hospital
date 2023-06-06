@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hospital/model/appointment.dart';
 import 'package:hospital/model/doctors.dart';
-import 'package:hospital/providers/hometabProviders.dart';
+import 'package:hospital/providers/home_tab_providers.dart';
 import 'package:hospital/screens/booking_screen.dart';
 import 'package:hospital/services/firebase/firebase_main_functions.dart';
 import 'package:hospital/services/size_config.dart';
@@ -13,7 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class DoctorsScreen extends StatefulWidget {
-  static const String routname = 'Doctors screen ';
+  static const String routName = 'Doctors screen ';
 
   const DoctorsScreen({super.key});
 
@@ -33,7 +33,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
 
     DoctorsModel doctorsModel =
         ModalRoute.of(context)!.settings.arguments as DoctorsModel;
-    for (Appointment appointment in homeTabProvider.userdata.appointments) {
+    for (Appointment appointment in homeTabProvider.userData.appointments) {
       if (appointment.doctorsID == doctorsModel.id) {
         currentAppointment = appointment;
         isDoctorFound = true;
@@ -41,24 +41,24 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
       }
     }
     for (var review in doctorsModel.reviews) {
-      stars += review.numstars;
+      stars += review.numStars;
     }
     stars = stars / doctorsModel.reviews.length;
     void cancelAppointment() {
       homeTabProvider.deleteUserAppointment(currentAppointment!.id);
       FirebaseMainFunctions.cancelAppointment(
-          homeTabProvider.userdata, doctorsModel, currentAppointment.id);
+          homeTabProvider.userData, doctorsModel, currentAppointment.id);
     }
 
     void editAppointment() {
       homeTabProvider.setEditAppointment(currentAppointment);
 
-      Navigator.pushNamed(context, BookingScreen.routname,
+      Navigator.pushNamed(context, BookingScreen.routName,
           arguments: doctorsModel);
     }
 
     return Scaffold(
-        backgroundColor: Themes.lighbackgroundColor,
+        backgroundColor: Themes.lightBackgroundColor,
         appBar: AppBar(
             centerTitle: true,
             leading: IconButton(
@@ -84,7 +84,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
             backgroundColor: Theme.of(context).primaryColor,
             child: CircleAvatar(
               radius: 60,
-              backgroundImage: NetworkImage(doctorsModel.imageurl),
+              backgroundImage: NetworkImage(doctorsModel.imageUrl),
               backgroundColor: Theme.of(context).primaryColor,
             ),
           ),
@@ -139,7 +139,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                 height: 10,
               ),
               Text(
-                '${doctorsModel.yersofexp.toString()} Years',
+                '${doctorsModel.yearsOfExp.toString()} Years',
                 style: Theme.of(context)
                     .textTheme
                     .bodySmall!
@@ -147,7 +147,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
               )
             ]),
           ),
-          homeTabProvider.isdoctor
+          homeTabProvider.isDoctor
               ? Container()
               : isDoctorFound
                   ? Container() //ways of comunication
@@ -157,7 +157,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                       margin: const EdgeInsets.symmetric(vertical: 10),
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.pushNamed(context, BookingScreen.routname,
+                          Navigator.pushNamed(context, BookingScreen.routName,
                               arguments: doctorsModel);
                           //move to boking screen
                         },
@@ -178,7 +178,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                         ),
                       ),
                     ),
-          homeTabProvider.isdoctor || currentAppointment == null
+          homeTabProvider.isDoctor || currentAppointment == null
               ? Container(
                   margin: const EdgeInsets.all(5),
                   padding:
@@ -210,7 +210,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                             child: FittedBox(
                               fit: BoxFit.fitWidth,
                               child: Text(
-                                ' ${wdays(doctorsModel)}(${doctorsModel.workinghours.starthour} - ${doctorsModel.workinghours.endhour})',
+                                ' ${wDays(doctorsModel)}(${doctorsModel.workingHours.startHour} - ${doctorsModel.workingHours.endHour})',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall!
@@ -327,7 +327,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                                     child: SlideAnimation(
                                       verticalOffset: 300,
                                       child: ReviewsList(
-                                        reviewsmodel:
+                                        reviewsModel:
                                             doctorsModel.reviews[index],
                                       ),
                                     ),
@@ -341,7 +341,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                                         height: 2,
                                         endIndent: 20,
                                         indent: 20,
-                                        color: Themes.textcolor,
+                                        color: Themes.textColor,
                                         thickness: 2,
                                       ));
                                 },
@@ -354,16 +354,16 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
         ]));
   }
 
-  String wdays(DoctorsModel doctorsModel) {
-    doctorsModel.workinghours.days.sort();
-    if (doctorsModel.workinghours.days.length == 7) {
+  String wDays(DoctorsModel doctorsModel) {
+    doctorsModel.workingHours.days.sort();
+    if (doctorsModel.workingHours.days.length == 7) {
       return 'Sun-Fri';
     }
     var isContinuous = true;
 
-    for (var i = 0; i < doctorsModel.workinghours.days.length - 1; i++) {
-      if (doctorsModel.workinghours.days[i + 1] -
-              doctorsModel.workinghours.days[i] !=
+    for (var i = 0; i < doctorsModel.workingHours.days.length - 1; i++) {
+      if (doctorsModel.workingHours.days[i + 1] -
+              doctorsModel.workingHours.days[i] !=
           1) {
         isContinuous = false;
         break;
@@ -372,11 +372,11 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
 
     List<int> nums = [1, 2, 3, 4, 5, 6, 7];
     var listEquality = const ListEquality<int>();
-    if (doctorsModel.workinghours.days.length >= 3 && isContinuous) {
+    if (doctorsModel.workingHours.days.length >= 3 && isContinuous) {
       for (int i = 0; i < nums.length; i++) {
         for (int j = i; j < nums.length; j++) {
           List<int> subList = nums.sublist(i, j + 1);
-          if (listEquality.equals(subList, doctorsModel.workinghours.days)) {
+          if (listEquality.equals(subList, doctorsModel.workingHours.days)) {
             String start = '';
             String end = '';
             if (subList[0] == 1) {
@@ -407,20 +407,20 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
     }
 
     String days = '';
-    for (int i = 0; i < doctorsModel.workinghours.days.length; i++) {
-      if (doctorsModel.workinghours.days[i] == 1) {
+    for (int i = 0; i < doctorsModel.workingHours.days.length; i++) {
+      if (doctorsModel.workingHours.days[i] == 1) {
         days = '${days}Sat-';
-      } else if (doctorsModel.workinghours.days[i] == 2) {
+      } else if (doctorsModel.workingHours.days[i] == 2) {
         days = '${days}Sun-';
-      } else if (doctorsModel.workinghours.days[i] == 3) {
+      } else if (doctorsModel.workingHours.days[i] == 3) {
         days = '${days}Mon-';
-      } else if (doctorsModel.workinghours.days[i] == 4) {
+      } else if (doctorsModel.workingHours.days[i] == 4) {
         days = '${days}Tue-';
-      } else if (doctorsModel.workinghours.days[i] == 5) {
+      } else if (doctorsModel.workingHours.days[i] == 5) {
         days = '${days}Wed-';
-      } else if (doctorsModel.workinghours.days[i] == 6) {
+      } else if (doctorsModel.workingHours.days[i] == 6) {
         days = '${days}Thu-';
-      } else if (doctorsModel.workinghours.days[i] == 7) {
+      } else if (doctorsModel.workingHours.days[i] == 7) {
         days = '${days}Fri-';
       }
     }

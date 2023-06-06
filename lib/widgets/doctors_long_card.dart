@@ -16,7 +16,7 @@ class DoctorsLongCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, DoctorsScreen.routname,
+        Navigator.pushNamed(context, DoctorsScreen.routName,
             arguments: doctorsModel);
       },
       child: Container(
@@ -24,7 +24,7 @@ class DoctorsLongCard extends StatelessWidget {
         padding: EdgeInsets.all(getProportionateScreenWidth(15)),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          color: Themes.lighbackgroundColor,
+          color: Themes.lightBackgroundColor,
         ),
         height: SizeConfig.screenHeight * .114,
         child: Row(
@@ -37,7 +37,7 @@ class DoctorsLongCard extends StatelessWidget {
                   backgroundColor: Theme.of(context).primaryColor,
                   child: CircleAvatar(
                     radius: 30,
-                    backgroundImage: NetworkImage(doctorsModel.imageurl),
+                    backgroundImage: NetworkImage(doctorsModel.imageUrl),
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
                 ),

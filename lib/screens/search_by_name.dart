@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hospital/model/doctors.dart';
-import 'package:hospital/providers/hometabProviders.dart';
+import 'package:hospital/providers/home_tab_providers.dart';
 import 'package:hospital/services/firebase/firebase_main_functions.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
@@ -8,7 +8,7 @@ import 'package:hospital/widgets/doctors_long_card.dart';
 import 'package:provider/provider.dart';
 
 class SearchByName extends StatefulWidget {
-  static const String routname = 'Search by name ';
+  static const String routName = 'Search by name ';
 
   const SearchByName({super.key});
 
@@ -47,7 +47,7 @@ class _SearchByNameState extends State<SearchByName> {
             child: CircleAvatar(
                 radius: 25,
                 backgroundImage:
-                    NetworkImage(homeTabProvider.userdata.imageurl)),
+                    NetworkImage(homeTabProvider.userData.imageUrl)),
           )
         ],
       ),
@@ -86,7 +86,7 @@ class _SearchByNameState extends State<SearchByName> {
                   contentPadding: const EdgeInsets.symmetric(
                       vertical: 10.0, horizontal: 15.0),
                   filled: true,
-                  fillColor: Themes.lighbackgroundColor,
+                  fillColor: Themes.lightBackgroundColor,
                   border: OutlineInputBorder(
                     borderSide: BorderSide.none,
                     borderRadius: BorderRadius.circular(20),

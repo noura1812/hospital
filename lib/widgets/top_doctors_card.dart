@@ -13,17 +13,17 @@ class TopDoctorsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     double stars = 0;
     for (var review in doctorsModel.reviews) {
-      stars += review.numstars;
+      stars += review.numStars;
     }
     stars = stars / doctorsModel.reviews.length;
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, DoctorsScreen.routname,
+        Navigator.pushNamed(context, DoctorsScreen.routName,
             arguments: doctorsModel);
       },
       child: Container(
         decoration: BoxDecoration(
-            color: Themes.lighbackgroundColor,
+            color: Themes.lightBackgroundColor,
             borderRadius: BorderRadius.circular(20)),
         width: SizeConfig.screenWidth * .41,
         padding: EdgeInsets.all(getProportionateScreenWidth(10)),
@@ -36,7 +36,7 @@ class TopDoctorsCard extends StatelessWidget {
               backgroundColor: Theme.of(context).primaryColor,
               child: CircleAvatar(
                 radius: 40,
-                backgroundImage: NetworkImage(doctorsModel.imageurl),
+                backgroundImage: NetworkImage(doctorsModel.imageUrl),
                 backgroundColor: Theme.of(context).primaryColor,
               ),
             ),

@@ -14,7 +14,7 @@ class UserImagePicker extends StatefulWidget {
 class _UserImagePickerState extends State<UserImagePicker> {
   File? _pickedImage;
 
-  Future pickimages() async {
+  Future pickImages() async {
     var image = await ImagePicker().pickImage(source: ImageSource.camera);
     setState(() {
       image == null ? null : _pickedImage = File(image.path);
@@ -23,7 +23,7 @@ class _UserImagePickerState extends State<UserImagePicker> {
     _pickedImage == null ? null : Navigator.pop(context);
   }
 
-  Future pickimagesgalry() async {
+  Future pickImagesGallery() async {
     var image = await ImagePicker().pickImage(source: ImageSource.gallery);
     setState(() {
       image == null ? null : _pickedImage = File(image.path);
@@ -66,7 +66,7 @@ class _UserImagePickerState extends State<UserImagePicker> {
                   backgroundColor: Themes.lightblue,
                   child: Icon(
                     Icons.camera_alt_outlined,
-                    color: Themes.lighbackgroundColor,
+                    color: Themes.lightBackgroundColor,
                     size: 25,
                   ),
                 ),
@@ -89,7 +89,7 @@ class _UserImagePickerState extends State<UserImagePicker> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                    onPressed: () async => pickimages(),
+                    onPressed: () async => pickImages(),
                     icon: const Icon(
                       Icons.camera_alt_outlined,
                       size: 40,
@@ -112,7 +112,7 @@ class _UserImagePickerState extends State<UserImagePicker> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                    onPressed: () async => pickimagesgalry(),
+                    onPressed: () async => pickImagesGallery(),
                     icon: const Icon(
                       Icons.image_outlined,
                       size: 40,

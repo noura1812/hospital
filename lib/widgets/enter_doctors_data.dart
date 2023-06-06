@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hospital/providers/signProviders.dart';
+import 'package:hospital/providers/sign_providers.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
 import 'package:hospital/widgets/working_time.dart';
@@ -18,8 +18,8 @@ class EnterDocsData extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var provider = Provider.of<Signprividers>(context);
-    var methodprovider = Provider.of<Signprividers>(context, listen: false);
+    var provider = Provider.of<SignProvider>(context);
+    var methodprovider = Provider.of<SignProvider>(context, listen: false);
 
     return Column(children: [
       DropdownButtonFormField(
@@ -45,7 +45,7 @@ class EnterDocsData extends StatelessWidget {
         value: provider.specialty,
         onSaved: (newValue) => provider.specialty = newValue!,
         onChanged: (value) {
-          methodprovider.changspeciality(value ?? '');
+          methodprovider.changSpecialty(value ?? '');
         },
         items: dropdownOptions.map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
@@ -82,7 +82,7 @@ class EnterDocsData extends StatelessWidget {
             }
             return null;
           },
-          onSaved: ((newValue) => methodprovider.changyearsofexp(newValue!)),
+          onSaved: ((newValue) => methodprovider.changYearsOfExp(newValue!)),
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
             errorStyle: Theme.of(context)
@@ -105,7 +105,7 @@ class EnterDocsData extends StatelessWidget {
           ),
         ),
       ),
-      Workingtime(),
+      WorkingTime(),
       Container(
         height: SizeConfig.screenHeight * .2,
         margin:
@@ -128,7 +128,7 @@ class EnterDocsData extends StatelessWidget {
             }
             return null;
           },
-          onSaved: ((newValue) => methodprovider.changabout(newValue!)),
+          onSaved: ((newValue) => methodprovider.changAbout(newValue!)),
           keyboardType: TextInputType.multiline,
           decoration: InputDecoration(
             errorStyle: Theme.of(context)

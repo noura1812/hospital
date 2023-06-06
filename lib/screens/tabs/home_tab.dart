@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hospital/model/doctors.dart';
-import 'package:hospital/model/fieldsmodel.dart';
-import 'package:hospital/providers/hometabProviders.dart';
+import 'package:hospital/model/fields_model.dart';
+import 'package:hospital/providers/home_tab_providers.dart';
 import 'package:hospital/screens/search_by_name.dart';
-import 'package:hospital/screens/search_by_speciality.dart';
+import 'package:hospital/screens/search_by_specialty.dart';
 import 'package:hospital/services/firebase/firebase_main_functions.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
@@ -47,7 +47,7 @@ class HomeTab extends StatelessWidget {
             onTap: () {
               focusNode.unfocus();
 
-              Navigator.pushNamed(context, SearchByName.routname);
+              Navigator.pushNamed(context, SearchByName.routName);
             },
             style: Theme.of(context)
                 .textTheme
@@ -72,7 +72,7 @@ class HomeTab extends StatelessWidget {
                 contentPadding: const EdgeInsets.symmetric(
                     vertical: 10.0, horizontal: 15.0),
                 filled: true,
-                fillColor: Themes.lighbackgroundColor,
+                fillColor: Themes.lightBackgroundColor,
                 border: OutlineInputBorder(
                   borderSide: BorderSide.none,
                   borderRadius: BorderRadius.circular(20),
@@ -157,15 +157,15 @@ class HomeTab extends StatelessWidget {
         decoration: BoxDecoration(
             color: e.selected
                 ? Theme.of(context).primaryColor
-                : Themes.lighbackgroundColor,
+                : Themes.lightBackgroundColor,
             borderRadius: BorderRadius.circular(12)),
         child: InkWell(
           onTap: () {
             homeTabMethods.selectField(e);
-            homeTabMethods.changeSpeciality(e.name != 'Dentist'
+            homeTabMethods.changeSpecialty(e.name != 'Dentist'
                 ? '${e.name.substring(0, e.name.length - 1)}ist'
                 : e.name);
-            Navigator.pushNamed(context, SearchBySpecialityScreen.routname);
+            Navigator.pushNamed(context, SearchBySpecialtyScreen.routName);
           },
           child: Column(
             children: [
@@ -196,7 +196,7 @@ class HomeTab extends StatelessWidget {
                               ?.copyWith(
                                   color: e.selected
                                       ? Colors.white
-                                      : Themes.textcolor,
+                                      : Themes.textColor,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 11),
                         ),

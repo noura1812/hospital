@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_verification_code/flutter_verification_code.dart';
-import 'package:hospital/providers/hometabProviders.dart';
+import 'package:hospital/providers/home_tab_providers.dart';
 import 'package:hospital/screens/home_screen.dart';
 import 'package:hospital/services/firebase/authentication.dart';
-import 'package:hospital/providers/signProviders.dart';
+import 'package:hospital/providers/sign_providers.dart';
 import 'package:hospital/services/firebase/firebase_main_functions.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
@@ -13,7 +13,7 @@ import 'package:provider/provider.dart';
 import 'dart:async';
 
 class SmsVerification extends StatefulWidget {
-  static const String routname = 'smsscreen';
+  static const String routName = 'smsScreen';
 
   const SmsVerification({super.key});
 
@@ -25,22 +25,31 @@ class _SmsVerificationState extends State<SmsVerification> {
   int _countdown = 70;
   String message = '';
   bool _disabled = false;
-  bool verefing = false;
-  bool verefied = false;
+  bool verifying = false;
+  bool verified = false;
   bool wrong = false;
+  FirebaseAuth auth = FirebaseAuth.instance;
 
+  late SignProvider gProvider;
+  late SignProvider gMethod;
+  late HomeTabProviders hProvider;
+  late SignProvider sProvider;
   void _startTimer() {
     {
       Timer.periodic(const Duration(seconds: 1), (timer) {
         if (_countdown > 0) {
           _countdown--;
         } else {
+          if (verifying) {
+            ToastMessage.toastMessage('Time out', true);
+            sProvider.changeLoading(false);
+          }
           _disabled = false;
-          verefing = false;
+          verifying = false;
           _countdown = 70;
           timer.cancel();
         }
-        if (verefied) {
+        if (verified) {
           timer.cancel();
           return;
         } else {
@@ -52,10 +61,11 @@ class _SmsVerificationState extends State<SmsVerification> {
 
   void goHome() {
     Navigator.of(context).pushNamedAndRemoveUntil(
-        HomeScreen.routname, (Route<dynamic> route) => false);
+        HomeScreen.routName, (Route<dynamic> route) => false);
   }
 
   void sendAgainVerify() {
+    Authentication.verifyPhoneNumber(gProvider, gMethod, goHome);
     if (!_disabled) {
       _disabled = true;
       _startTimer();
@@ -65,7 +75,9 @@ class _SmsVerificationState extends State<SmsVerification> {
 
   @override
   void initState() {
-    sendAgainVerify();
+    _disabled = true;
+
+    _startTimer();
     super.initState();
   }
 
@@ -74,15 +86,17 @@ class _SmsVerificationState extends State<SmsVerification> {
     SizeConfig().init(context);
 
 //    sendAgainVerify();
-    var provider = Provider.of<Signprividers>(context);
-    var methodprovider = Provider.of<Signprividers>(context, listen: false);
+    var provider = Provider.of<SignProvider>(context);
+    gProvider = provider;
+    var methodProvider = Provider.of<SignProvider>(context, listen: false);
+    gMethod = methodProvider;
+    sProvider = methodProvider;
     var homeTabMethods = Provider.of<HomeTabProviders>(context, listen: false);
-    FirebaseAuth auth = FirebaseAuth.instance;
-    verefied = provider.verified;
-    String url = '';
+    hProvider = homeTabMethods;
+    verified = provider.verified;
 
     return Scaffold(
-      backgroundColor: Themes.lighbackgroundColor,
+      backgroundColor: Themes.lightBackgroundColor,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -125,7 +139,7 @@ class _SmsVerificationState extends State<SmsVerification> {
                   clearAll: Container(
                     color: Colors.red,
                   ),
-                  autofocus: false,
+                  autofocus: true,
                   underlineUnfocusedColor: Colors.transparent,
                   fillColor: Themes.backgroundColor,
                   textStyle: Theme.of(context)
@@ -143,7 +157,7 @@ class _SmsVerificationState extends State<SmsVerification> {
                 const SizedBox(
                   height: 5,
                 ),
-                verefing
+                verifying
                     ? Text(
                         'verifying...',
                         style: Theme.of(context)
@@ -176,7 +190,7 @@ class _SmsVerificationState extends State<SmsVerification> {
                       : () {
                           sendAgainVerify();
                           Authentication.verifyPhoneNumber(
-                              provider, methodprovider, goHome);
+                              provider, methodProvider, goHome);
                         },
                   child: Text(
                     _disabled
@@ -184,7 +198,10 @@ class _SmsVerificationState extends State<SmsVerification> {
                         : 'Send Verification Code',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                        color: Theme.of(context).primaryColor, fontSize: 18),
+                        color: _disabled
+                            ? Themes.textColor
+                            : Theme.of(context).primaryColor,
+                        fontSize: 18),
                   ),
                 ),
                 Container(
@@ -193,21 +210,17 @@ class _SmsVerificationState extends State<SmsVerification> {
                   margin: const EdgeInsets.only(
                       top: 20, bottom: 30, right: 30, left: 30),
                   child: ElevatedButton(
-                    onPressed: provider.loading
-                        ? null
-                        : () {
-                            //  loadding(true);
-                            methodprovider.changeloading(true);
+                    onPressed:
+                        provider.loading || message.length < 6 || !_disabled
+                            ? null
+                            : () {
+                                methodProvider.changeLoading(true);
 
-                            verefing = true;
-                            wrong = false;
-                            setState(() {});
-                            provider.islogin
-                                ? login(auth, provider, methodprovider,
-                                    homeTabMethods, message, url)
-                                : addUser(auth, provider, methodprovider,
-                                    homeTabMethods, message, url);
-                          },
+                                verifying = true;
+                                wrong = false;
+                                setState(() {});
+                                provider.isLogin ? login() : addUser();
+                              },
                     style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
@@ -241,92 +254,84 @@ class _SmsVerificationState extends State<SmsVerification> {
     );
   }
 
-  addUser(
-      FirebaseAuth auth,
-      Signprividers provider,
-      Signprividers methodprovider,
-      HomeTabProviders homeTabMethods,
-      message,
-      url) async {
+  addUser() async {
     try {
       final userCredential = await auth.signInWithCredential(
           PhoneAuthProvider.credential(
-              verificationId: provider.verificationId,
+              verificationId: gProvider.verificationId,
               smsCode: message.trim()));
 
-      url = await FirebaseMainFunctions.addImage(
-          provider.phone, provider.imageFile);
-      if (provider.isadoctor) {
-        methodprovider.setDoctorsUrl(url);
+      String url = await FirebaseMainFunctions.addImage(
+          gProvider.phone, gProvider.imageFile);
+      if (gProvider.isaDoctor) {
+        gMethod.setDoctorsUrl(url);
 
         await FirebaseMainFunctions.addADoctor(
-                provider.doctorsdata, userCredential.user!.uid)
+                gProvider.doctorsData, userCredential.user!.uid)
             .then((value) {
-          ToastMessage.toastmessage('Signed up successfully!', false);
+          ToastMessage.toastMessage('Signed up successfully!', false);
 
-          methodprovider.changeloading(false);
-          homeTabMethods.setUserData(provider.doctorsdata);
-          methodprovider.changeverified(true);
+          gMethod.changeLoading(false);
+          hProvider.setUserData(gProvider.doctorsData);
+          gMethod.changeVerified(true);
+          gMethod.changeIsLogin(true);
           Navigator.of(context).pushNamedAndRemoveUntil(
-              HomeScreen.routname, (Route<dynamic> route) => false);
+              HomeScreen.routName, (Route<dynamic> route) => false);
         });
       } else {
-        methodprovider.setPAtiontssUrl(url);
-        methodprovider.setpatentsdata();
+        gMethod.setPatientsUrl(url);
+        gMethod.setPatientsData();
 
-        await FirebaseMainFunctions.addAPationt(
-                provider.pationtdata, userCredential.user!.uid)
+        await FirebaseMainFunctions.addAPatient(
+                gProvider.patientData, userCredential.user!.uid)
             .then((value) {
-          ToastMessage.toastmessage('Signed up successfully!', false);
-          homeTabMethods.setUserData(provider.pationtdata);
+          ToastMessage.toastMessage('Signed up successfully!', false);
+          hProvider.setUserData(gProvider.patientData);
           //     callback(false);
-          methodprovider.changeloading(false);
+          gMethod.changeLoading(false);
 
-          methodprovider.changeisadoctor(false);
-          methodprovider.changeverified(true);
+          gMethod.changeIsaDoctor(false);
+          gMethod.changeVerified(true);
           Navigator.of(context).pushNamedAndRemoveUntil(
-              HomeScreen.routname, (Route<dynamic> route) => false);
+              HomeScreen.routName, (Route<dynamic> route) => false);
         });
       }
-    } catch (e) {
-      if (message == '') {
-        verefing = false;
+    } on FirebaseAuthException catch (e) {
+      if (e.message ==
+          'The verification code from SMS/TOTP is invalid. Please check and enter the correct verification code again.') {
+        gMethod.changeLoading(false);
+        verifying = false;
         wrong = true;
         setState(() {});
-      }
-      if (e == 'invalid-verification-code') {
-        methodprovider.changeloading(false);
-
-        verefing = false;
-        wrong = true;
+      } else {
+        gMethod.changeLoading(false);
+        ToastMessage.toastMessage('Try again later', true);
+        verifying = false;
         setState(() {});
       }
     }
   }
 
-  login(FirebaseAuth auth, Signprividers provider, Signprividers methodprovider,
-      homeTabMethods, message, url) async {
+  login() async {
     try {
-      final userCredential = await auth.signInWithCredential(
-          PhoneAuthProvider.credential(
-              verificationId: provider.verificationId,
-              smsCode: message.trim()));
+      await auth.signInWithCredential(PhoneAuthProvider.credential(
+          verificationId: gProvider.verificationId, smsCode: message.trim()));
 
-      methodprovider.changeloading(false);
-      methodprovider.changeverified(true);
+      gMethod.changeLoading(false);
+      gMethod.changeVerified(true);
 
-      Authentication().signin(methodprovider, provider, homeTabMethods, goHome);
-    } catch (e) {
-      methodprovider.changeloading(false);
-
-      if (e == 'invalid-verification-code') {
-        verefing = false;
+      Authentication().signIn(gMethod, gProvider, hProvider, goHome);
+    } on FirebaseAuthException catch (e) {
+      if (e.message ==
+          'The verification code from SMS/TOTP is invalid. Please check and enter the correct verification code again.') {
+        gMethod.changeLoading(false);
+        verifying = false;
         wrong = true;
         setState(() {});
-      }
-      if (message == '') {
-        verefing = false;
-        wrong = true;
+      } else {
+        gMethod.changeLoading(false);
+        ToastMessage.toastMessage('Try again later', true);
+        verifying = false;
         setState(() {});
       }
     }

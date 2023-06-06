@@ -1,18 +1,18 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:hospital/model/appointment.dart';
 
-class PationtModel {
+class PatientModel {
   String name;
   String phoneNumber;
-  String imageurl;
+  String imageUrl;
   String id;
   List<Appointment> appointments;
 
-  PationtModel({
+  PatientModel({
     required this.name,
     this.id = '',
     required this.phoneNumber,
-    required this.imageurl,
+    required this.imageUrl,
     required this.appointments,
   });
   Map<String, dynamic> toJson() {
@@ -20,20 +20,20 @@ class PationtModel {
       'id': id,
       'name': name,
       'phoneNumber': phoneNumber,
-      'imageurl': imageurl,
+      'imageurl': imageUrl,
       'appointments': List<dynamic>.from(
           appointments.map((appointment) => appointment.toJson()))
     };
   }
 
-  PationtModel.fromjson(Map<String, dynamic> json)
+  PatientModel.fromJson(Map<String, dynamic> json)
       : this(
           appointments: (json['appointments'] != null)
               ? List<Appointment>.from(json['appointments']
                   .map((review) => Appointment.fromJson(review)))
               : [],
           id: json['id'],
-          imageurl: json['imageurl'],
+          imageUrl: json['imageurl'],
           name: json['name'],
           phoneNumber: json['phoneNumber'],
         );

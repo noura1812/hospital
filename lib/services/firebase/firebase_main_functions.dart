@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hospital/model/doctors.dart';
-import 'package:hospital/model/pationtmodel.dart';
+import 'package:hospital/model/patient_model.dart';
 
 class FirebaseMainFunctions {
   static CollectionReference<DoctorsModel> getDoctorsCollection() {
@@ -9,7 +9,7 @@ class FirebaseMainFunctions {
         .collection('doctors')
         .withConverter<DoctorsModel>(
       fromFirestore: (snapshot, options) {
-        return DoctorsModel.fromjson(snapshot.data()!);
+        return DoctorsModel.fromJson(snapshot.data()!);
       },
       toFirestore: (value, options) {
         return value.toJson();
@@ -30,13 +30,13 @@ class FirebaseMainFunctions {
     return collection.snapshots();
   }
 
-  static Future<QuerySnapshot<DoctorsModel>> getDoctorsBySpeciality(
-      String speciality) {
+  static Future<QuerySnapshot<DoctorsModel>> getDoctorsBySpecialty(
+      String specialty) {
     var collection = getDoctorsCollection();
-    return collection.where('specialty', isEqualTo: speciality).get();
+    return collection.where('specialty', isEqualTo: specialty).get();
   }
 
-  static Stream<QuerySnapshot<DoctorsModel>> getDoctorsByname(String name) {
+  static Stream<QuerySnapshot<DoctorsModel>> getDoctorsByName(String name) {
     var collection = getDoctorsCollection();
     return collection.where('name', isEqualTo: name).snapshots();
   }
@@ -59,17 +59,17 @@ class FirebaseMainFunctions {
   }
 /////////////////////////////////////////////////////////////////////////////////////
 
-  static Future<DocumentSnapshot<PationtModel>> getPationtsById(String id) {
-    var collection = getPationtsCollection();
+  static Future<DocumentSnapshot<PatientModel>> getPatientsById(String id) {
+    var collection = getPatientsCollection();
     return collection.doc(id).get();
   }
 
-  static CollectionReference<PationtModel> getPationtsCollection() {
+  static CollectionReference<PatientModel> getPatientsCollection() {
     return FirebaseFirestore.instance
         .collection('pationts')
-        .withConverter<PationtModel>(
+        .withConverter<PatientModel>(
       fromFirestore: (snapshot, options) {
-        return PationtModel.fromjson(snapshot.data()!);
+        return PatientModel.fromJson(snapshot.data()!);
       },
       toFirestore: (value, options) {
         return value.toJson();
@@ -77,20 +77,20 @@ class FirebaseMainFunctions {
     );
   }
 
-  static Future<void> addAPationt(PationtModel pationtModel, id) {
-    var collection = getPationtsCollection();
+  static Future<void> addAPatient(PatientModel patientModel, id) {
+    var collection = getPatientsCollection();
     var docRef = collection.doc(id);
-    pationtModel.id = id;
-    return docRef.set(pationtModel);
+    patientModel.id = id;
+    return docRef.set(patientModel);
   }
 
-  static Stream<QuerySnapshot<PationtModel>> getAllPationts() {
-    var collection = getPationtsCollection();
+  static Stream<QuerySnapshot<PatientModel>> getAllPatients() {
+    var collection = getPatientsCollection();
     return collection.snapshots();
   }
 
-  static Future<QuerySnapshot<PationtModel>> searchForAPationt(phoneNumber) {
-    var collection = getPationtsCollection();
+  static Future<QuerySnapshot<PatientModel>> searchForAPatient(phoneNumber) {
+    var collection = getPatientsCollection();
     return collection.where('phoneNumber', isEqualTo: phoneNumber).get();
   }
 
@@ -103,21 +103,21 @@ class FirebaseMainFunctions {
     return ref.getDownloadURL();
   }
 
-  static Future<void> updatePationt(PationtModel pationtModel) {
-    return getPationtsCollection().doc(pationtModel.id).update({
+  static Future<void> updatePatient(PatientModel patientModel) {
+    return getPatientsCollection().doc(patientModel.id).update({
       'appointments': List<dynamic>.from(
-          pationtModel.appointments.map((appointment) => appointment.toJson()))
+          patientModel.appointments.map((appointment) => appointment.toJson()))
     });
   }
 ////////////////////////////////////////
 
-  static Future<void> cancelAppointment(PationtModel pationtModel,
-      DoctorsModel doctorsModel, String appointmentid) {
-    pationtModel.appointments
-        .removeWhere((element) => element.id == appointmentid);
+  static Future<void> cancelAppointment(PatientModel patientModel,
+      DoctorsModel doctorsModel, String appointmentId) {
+    patientModel.appointments
+        .removeWhere((element) => element.id == appointmentId);
     doctorsModel.appointments
-        .removeWhere((element) => element.id == appointmentid);
-    updatePationt(pationtModel);
+        .removeWhere((element) => element.id == appointmentId);
+    updatePatient(patientModel);
     return updateDoctors(doctorsModel);
   }
 }

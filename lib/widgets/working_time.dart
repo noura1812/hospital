@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:hospital/providers/signProviders.dart';
+import 'package:hospital/providers/sign_providers.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
-class Workingtime extends StatelessWidget {
+class WorkingTime extends StatelessWidget {
   final days = [
     {'id': 1, 'name': 'Saturday'},
     {'id': 2, 'name': 'Sunday'},
@@ -16,12 +16,12 @@ class Workingtime extends StatelessWidget {
   ];
   final RegExp regExp = RegExp(r'^([01]?[0-9]|2[0-3]):00$');
 
-  Workingtime({super.key});
+  WorkingTime({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var provider = Provider.of<Signprividers>(context);
-    var methodprovider = Provider.of<Signprividers>(context, listen: false);
+    var provider = Provider.of<SignProvider>(context);
+    var methodProvider = Provider.of<SignProvider>(context, listen: false);
 
     return Stack(
       children: [
@@ -61,7 +61,7 @@ class Workingtime extends StatelessWidget {
                           }
                           return null;
                         },
-                        onSaved: ((newValue) => provider.starttime = newValue!),
+                        onSaved: ((newValue) => provider.startTime = newValue!),
                         keyboardType: TextInputType.phone,
                         decoration: InputDecoration(
                           suffixIcon: ConstrainedBox(
@@ -69,8 +69,8 @@ class Workingtime extends StatelessWidget {
                               maxWidth:
                                   50, // Minimum Width of the DropdownButtonFormField
                             ),
-                            child: dropdownpmam(
-                                context, 'start', provider, methodprovider),
+                            child: dropDownPmAm(
+                                context, 'start', provider, methodProvider),
                           ),
                           errorStyle: Theme.of(context)
                               .textTheme
@@ -113,15 +113,15 @@ class Workingtime extends StatelessWidget {
                               value.isEmpty ||
                               !regExp.hasMatch(value)) {
                             return 'Pleas enter a valid end hour';
-                          } else if (provider.endpm == provider.startpm) {
+                          } else if (provider.endPm == provider.startPm) {
                             if (int.parse(value.split(':')[0]) <
-                                int.parse(provider.starttime.split(':')[0])) {
+                                int.parse(provider.startTime.split(':')[0])) {
                               return 'Pleas enter a valid end hour';
                             }
                           }
                           return null;
                         },
-                        onSaved: ((newValue) => provider.endtime = newValue!),
+                        onSaved: ((newValue) => provider.endTime = newValue!),
                         keyboardType: TextInputType.phone,
                         decoration: InputDecoration(
                           suffixIcon: ConstrainedBox(
@@ -129,8 +129,8 @@ class Workingtime extends StatelessWidget {
                               maxWidth:
                                   50, // Minimum Width of the DropdownButtonFormField
                             ),
-                            child: dropdownpmam(
-                                context, 'end', provider, methodprovider),
+                            child: dropDownPmAm(
+                                context, 'end', provider, methodProvider),
                           ),
                           errorStyle: Theme.of(context)
                               .textTheme
@@ -180,7 +180,7 @@ class Workingtime extends StatelessWidget {
         Align(
           alignment: Alignment.topLeft,
           child: Container(
-            color: Themes.lighbackgroundColor,
+            color: Themes.lightBackgroundColor,
             padding: EdgeInsets.symmetric(
                 horizontal: getProportionateScreenHeight(5),
                 vertical: getProportionateScreenHeight(3)),
@@ -199,15 +199,16 @@ class Workingtime extends StatelessWidget {
     );
   }
 
-  dropdownpmam(context, String state, provider, methodprovider) {
+  dropDownPmAm(context, String state, SignProvider provider,
+      SignProvider methodProvider) {
     return DropdownButtonFormField<String>(
       decoration: const InputDecoration(
         border: InputBorder.none,
       ),
-      value: state == 'start' ? provider.startpm : provider.endpm,
+      value: state == 'start' ? provider.startPm : provider.endPm,
       onSaved: (newValue) => state == 'start'
-          ? provider.startpm = newValue!
-          : provider.endpm = newValue!,
+          ? provider.startPm = newValue!
+          : provider.endPm = newValue!,
       items: ['PM', "AM"].map((String value) {
         return DropdownMenuItem<String>(
           value: value,
@@ -215,9 +216,11 @@ class Workingtime extends StatelessWidget {
         );
       }).toList(),
       onChanged: (newValueSelected) {
-        state == 'start'
-            ? methodprovider.changstartpm(newValueSelected)
-            : methodprovider.changendtpm(newValueSelected);
+        if (newValueSelected != null) {
+          state == 'start'
+              ? methodProvider.changeStartPm(newValueSelected)
+              : methodProvider.changeEndPm(newValueSelected);
+        }
       },
       icon: const Icon(
         Icons.arrow_drop_down,
@@ -250,10 +253,10 @@ class Workingtime extends StatelessWidget {
                   MultiSelectItem(option['id'], option['name'].toString()))
               .toList(),
           onConfirm: (results) {
-            Provider.of<Signprividers>(context, listen: false)
-                .setdayvalue(results);
+            Provider.of<SignProvider>(context, listen: false)
+                .setDayValue(results);
           },
-          initialValue: Provider.of<Signprividers>(context).days,
+          initialValue: Provider.of<SignProvider>(context).days,
         );
       },
     );

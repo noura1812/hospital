@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:hospital/model/appointment.dart';
-import 'package:hospital/model/reviewmodel.dart';
-import 'package:hospital/model/workinghours.dart';
+import 'package:hospital/model/review_model.dart';
+import 'package:hospital/model/working_hours.dart';
 
 class DoctorsModel {
   String id;
@@ -10,10 +10,10 @@ class DoctorsModel {
   String phoneNumber;
   String specialty;
   String about;
-  String yersofexp;
-  String imageurl;
-  WorkingHoursModel workinghours;
-  List<Reviewsmodel> reviews;
+  String yearsOfExp;
+  String imageUrl;
+  WorkingHoursModel workingHours;
+  List<ReviewsModel> reviews;
   List<Appointment> appointments;
   DoctorsModel({
     this.id = '',
@@ -21,9 +21,9 @@ class DoctorsModel {
     required this.phoneNumber,
     required this.specialty,
     required this.about,
-    required this.yersofexp,
-    required this.imageurl,
-    required this.workinghours,
+    required this.yearsOfExp,
+    required this.imageUrl,
+    required this.workingHours,
     required this.reviews,
     required this.appointments,
   });
@@ -31,21 +31,21 @@ class DoctorsModel {
     return {
       'id': id,
       'about': about,
-      'imageurl': imageurl,
+      'imageurl': imageUrl,
       'name': name,
       'phoneNumber': phoneNumber,
       'specialty': specialty,
-      'yersofexp': yersofexp,
-      'starthour': workinghours.starthour,
-      'endhour': workinghours.endhour,
-      'days': FieldValue.arrayUnion(workinghours.days),
+      'yersofexp': yearsOfExp,
+      'starthour': workingHours.startHour,
+      'endhour': workingHours.endHour,
+      'days': FieldValue.arrayUnion(workingHours.days),
       'reviews': List<dynamic>.from(reviews.map((review) => review.toJson())),
       'appointments': List<dynamic>.from(
           appointments.map((appointment) => appointment.toJson()))
     };
   }
 
-  DoctorsModel.fromjson(Map<String, dynamic> json)
+  DoctorsModel.fromJson(Map<String, dynamic> json)
       : this(
           appointments: (json['appointments'] != null)
               ? List<Appointment>.from(json['appointments']
@@ -53,18 +53,18 @@ class DoctorsModel {
               : [],
           id: json['id'],
           about: json['about'],
-          imageurl: json['imageurl'],
+          imageUrl: json['imageurl'],
           name: json['name'],
           phoneNumber: json['phoneNumber'],
           specialty: json['specialty'],
-          workinghours: WorkingHoursModel(
-              starthour: json['starthour'],
-              endhour: json['endhour'],
+          workingHours: WorkingHoursModel(
+              startHour: json['starthour'],
+              endHour: json['endhour'],
               days: (json['days'] != null) ? List<int>.from(json['days']) : []),
-          yersofexp: json['yersofexp'],
+          yearsOfExp: json['yersofexp'],
           reviews: (json['reviews'] != null)
-              ? List<Reviewsmodel>.from(json['reviews']
-                  .map((review) => Reviewsmodel.fromjson(review)))
+              ? List<ReviewsModel>.from(json['reviews']
+                  .map((review) => ReviewsModel.fromJson(review)))
               : [],
         );
 }

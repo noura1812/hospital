@@ -1,22 +1,22 @@
-class Reviewsmodel {
+class ReviewsModel {
   String id;
   String name;
   String review;
-  int numstars;
-  Reviewsmodel({
+  int numStars;
+  ReviewsModel({
     required this.id,
     required this.name,
     required this.review,
-    required this.numstars,
+    required this.numStars,
   });
-  Reviewsmodel.fromjson(Map<String, dynamic> json)
+  ReviewsModel.fromJson(Map<String, dynamic> json)
       : this(
             id: json['id'],
             name: json['name'],
-            numstars: json['numstars'],
+            numStars: json['numstars'],
             review: json['review']);
 
   Map<String, dynamic> toJson() {
-    return {'name': name, 'review': review, 'numstars': numstars, 'id': id};
+    return {'name': name, 'review': review, 'numstars': numStars, 'id': id};
   }
 }

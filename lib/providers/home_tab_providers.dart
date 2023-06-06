@@ -3,12 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hospital/model/appointment.dart';
 
-import 'package:hospital/model/fieldsmodel.dart';
+import 'package:hospital/model/fields_model.dart';
 import 'package:hospital/services/firebase/firebase_main_functions.dart';
 
 class HomeTabProviders with ChangeNotifier {
-  var userdata;
-  bool isdoctor = false;
+  var userData;
+  bool isDoctor = false;
   User? firebaseUser;
   Appointment? editAppointment;
   List<FieldsModel> fields = [
@@ -35,55 +35,55 @@ class HomeTabProviders with ChangeNotifier {
         name: 'Dentist',
         icon: ('assets/images/tooth icon.png')),
   ];
-  String speciality = '';
+  String specialty = '';
   HomeTabProviders() {
     firebaseUser = FirebaseAuth.instance.currentUser;
     if (firebaseUser != null) {
-      chekUser();
+      chickUser();
     }
   }
-  void chekUser() async {
+  void chickUser() async {
     var doctor = await FirebaseMainFunctions.getDoctorsById(firebaseUser!.uid);
     var pationt =
-        await FirebaseMainFunctions.getPationtsById(firebaseUser!.uid);
+        await FirebaseMainFunctions.getPatientsById(firebaseUser!.uid);
     if (doctor.exists) {
-      userdata = doctor.data()!;
-      isdoctor = true;
+      userData = doctor.data()!;
+      isDoctor = true;
       notifyListeners();
     } else if (pationt.exists) {
-      userdata = pationt.data()!;
-      isdoctor = false;
+      userData = pationt.data()!;
+      isDoctor = false;
       notifyListeners();
     }
   }
 
-  setEditAppointment(value) {
+  setEditAppointment(Appointment? value) {
     editAppointment = value;
     notifyListeners();
   }
 
-  adduserAppointment(Appointment appointment) {
-    userdata.appointments.add(appointment);
+  addUserAppointment(Appointment appointment) {
+    userData.appointments.add(appointment);
     notifyListeners();
   }
 
-  deleteUserAppointment(id) {
-    userdata.appointments.removeWhere((element) => element.id == id);
+  deleteUserAppointment(String id) {
+    userData.appointments.removeWhere((element) => element.id == id);
     notifyListeners();
   }
 
-  changeSpeciality(String value) {
-    speciality = value;
+  changeSpecialty(String value) {
+    specialty = value;
     notifyListeners();
   }
 
   setUserData(value) {
-    userdata = value;
+    userData = value;
     notifyListeners();
   }
 
-  setIsdoctor(bool value) {
-    isdoctor = value;
+  setIsDoctor(bool value) {
+    isDoctor = value;
     notifyListeners();
   }
 

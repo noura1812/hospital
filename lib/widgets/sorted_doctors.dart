@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hospital/model/doctors.dart';
-import 'package:hospital/providers/hometabProviders.dart';
+import 'package:hospital/providers/home_tab_providers.dart';
 import 'package:hospital/services/firebase/firebase_main_functions.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
@@ -35,7 +35,7 @@ class _SortedDoctorsState extends State<SortedDoctors> {
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              color: Themes.lighbackgroundColor,
+              color: Themes.lightBackgroundColor,
             ),
             margin:
                 EdgeInsets.symmetric(vertical: getProportionateScreenWidth(15)),
@@ -73,8 +73,8 @@ class _SortedDoctorsState extends State<SortedDoctors> {
                 doctorsModel.sort(
                     (a, b) => b.reviews.length.compareTo(a.reviews.length));
               } else if (indexOfSort == 3) {
-                doctorsModel.sort((a, b) => double.parse(b.yersofexp)
-                    .compareTo(double.parse(a.yersofexp)));
+                doctorsModel.sort((a, b) => double.parse(b.yearsOfExp)
+                    .compareTo(double.parse(a.yearsOfExp)));
               }
 
               if (doctorsModel.isEmpty) {
@@ -93,8 +93,8 @@ class _SortedDoctorsState extends State<SortedDoctors> {
                 ),
               );
             },
-            future: FirebaseMainFunctions.getDoctorsBySpeciality(
-                homeTabProvider.speciality),
+            future: FirebaseMainFunctions.getDoctorsBySpecialty(
+                homeTabProvider.specialty),
           ),
         ],
       ),
@@ -104,7 +104,7 @@ class _SortedDoctorsState extends State<SortedDoctors> {
   int getTotalStars(DoctorsModel doctor) {
     int sum = 0;
     for (var review in doctor.reviews) {
-      sum += review.numstars;
+      sum += review.numStars;
     }
     return sum;
   }

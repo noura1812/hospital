@@ -37,7 +37,7 @@ class AppointmentCard extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(3),
                 child: Text(
-                  'Next appointment',
+                  'Your appointment',
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: Themes.grey,
                       fontSize: 17,

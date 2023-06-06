@@ -1,14 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hospital/model/doctors.dart';
-import 'package:hospital/model/pationtmodel.dart';
-import 'package:hospital/providers/hometabProviders.dart';
-import 'package:hospital/providers/signProviders.dart';
+import 'package:hospital/model/patient_model.dart';
+import 'package:hospital/providers/home_tab_providers.dart';
+import 'package:hospital/providers/sign_providers.dart';
 import 'package:hospital/services/firebase/firebase_main_functions.dart';
 import 'package:hospital/widgets/toast.dart';
 
 class Authentication {
   static Future<void> verifyPhoneNumber(
-      provider, Signprividers methodprovider, Function goHome) async {
+      provider, SignProvider methodProvider, Function goHome) async {
     FirebaseAuth auth = FirebaseAuth.instance;
     auth.verifyPhoneNumber(
       timeout: const Duration(seconds: 60),
@@ -17,95 +17,96 @@ class Authentication {
         auth.signInWithCredential(credential);
       },
       verificationFailed: (FirebaseAuthException e) {
-        methodprovider.changeloading(false);
+        methodProvider.changeLoading(false);
 
         if (e.code == 'invalid-phone-number') {
-          ToastMessage.toastmessage('Invalid phone number.', true);
+          ToastMessage.toastMessage('Invalid phone number.', true);
         } else if (e.code == 'session-expired') {
-          ToastMessage.toastmessage('try again later.', true);
+          ToastMessage.toastMessage('try again later.', true);
         } else if (e.code == 'code-expired') {
-          ToastMessage.toastmessage('Code expired try again later.', true);
+          ToastMessage.toastMessage('Code expired try again later.', true);
         } else if (e.code == 'invalid-verification-code') {
-          ToastMessage.toastmessage('Invalid verification code.', true);
+          ToastMessage.toastMessage('Invalid verification code.', true);
         } else {
-          ToastMessage.toastmessage(
-              'There was an arror try again later.', true);
+          ToastMessage.toastMessage(
+              'There was an error try again later.', true);
         }
       },
       codeSent: (String verificationId, [int? forceResendingToken]) {
-        methodprovider.changeVerificationId(verificationId);
+        methodProvider.changeVerificationId(verificationId);
       },
       codeAutoRetrievalTimeout: (String verificationId) {},
     );
   }
 
-  void signin(
+  void signIn(
       //get users data
-      Signprividers methodprovider,
-      Signprividers provider,
+      SignProvider methodProvider,
+      SignProvider provider,
       HomeTabProviders homeTabProviderMethods,
       Function goHome) async {
-    final doctorsdata =
+    final doctorsData =
         await FirebaseMainFunctions.searchForADoctors(provider.phone);
-    final pationtssdata =
-        await FirebaseMainFunctions.searchForAPationt(provider.phone);
+    final patientsData =
+        await FirebaseMainFunctions.searchForAPatient(provider.phone);
 
-    if (doctorsdata.docs.isNotEmpty || pationtssdata.docs.isNotEmpty) {
-      methodprovider.changeloading(false);
+    if (doctorsData.docs.isNotEmpty || patientsData.docs.isNotEmpty) {
+      methodProvider.changeLoading(false);
 
-      if (doctorsdata.docs.isNotEmpty) {
-        DoctorsModel doctorsModel = doctorsdata.docs[0].data();
-        methodprovider.changeisadoctor(true);
-        methodprovider.getdoctorsdata(doctorsModel);
-        homeTabProviderMethods.setIsdoctor(true);
+      if (doctorsData.docs.isNotEmpty) {
+        DoctorsModel doctorsModel = doctorsData.docs[0].data();
+        methodProvider.changeIsaDoctor(true);
+        methodProvider.getDoctorsData(doctorsModel);
+        homeTabProviderMethods.setIsDoctor(true);
         homeTabProviderMethods.setUserData(doctorsModel);
       } else {
-        PationtModel pationtModel = pationtssdata.docs[0].data();
-        methodprovider.changeisadoctor(false);
-        methodprovider.getPationtsData(pationtModel);
-        homeTabProviderMethods.setIsdoctor(false);
+        PatientModel patientModel = patientsData.docs[0].data();
+        methodProvider.changeIsaDoctor(false);
+        methodProvider.getPatientsData(patientModel);
+        homeTabProviderMethods.setIsDoctor(false);
 
-        homeTabProviderMethods.setUserData(pationtModel);
+        homeTabProviderMethods.setUserData(patientModel);
       }
 
-      ToastMessage.toastmessage('logged in successfully!', false);
+      ToastMessage.toastMessage('logged in successfully!', false);
 
       goHome();
     } else {
-      methodprovider.changeloading(false);
+      methodProvider.changeLoading(false);
 
-      ToastMessage.toastmessage('Invalid phone number!', true);
+      ToastMessage.toastMessage('Invalid phone number!', true);
     }
   }
 
-  static Future<bool> chek(Signprividers provider, methodprovider) async {
-    final doctorsdata =
+  static Future<bool> chick(
+      SignProvider provider, SignProvider methodProvider) async {
+    final doctorsData =
         await FirebaseMainFunctions.searchForADoctors(provider.phone);
 
-    final pationtssdata =
-        await FirebaseMainFunctions.searchForAPationt(provider.phone);
+    final patientsData =
+        await FirebaseMainFunctions.searchForAPatient(provider.phone);
 
-    if (provider.islogin) {
-      if (doctorsdata.docs.isNotEmpty || pationtssdata.docs.isNotEmpty) {
-        methodprovider.changeloading(false);
+    if (provider.isLogin) {
+      if (doctorsData.docs.isNotEmpty || patientsData.docs.isNotEmpty) {
+        methodProvider.changeLoading(false);
         return true;
       } else {
-        ToastMessage.toastmessage('Invaled Phone Number!', true);
-        methodprovider.changeloading(false);
+        ToastMessage.toastMessage('Invalid Phone Number!', true);
+        methodProvider.changeLoading(false);
 
         return false;
       }
     } else {
-      if (doctorsdata.docs.isNotEmpty || pationtssdata.docs.isNotEmpty) {
-        methodprovider.changeloading(false);
+      if (doctorsData.docs.isNotEmpty || patientsData.docs.isNotEmpty) {
+        methodProvider.changeLoading(false);
 
-        ToastMessage.toastmessage('already signed up try signing in!', true);
+        ToastMessage.toastMessage('already signed up try signing in!', true);
         return false;
       } else {
         if (provider.imageFile == null) {
-          methodprovider.changeloading(false);
+          methodProvider.changeLoading(false);
 
-          ToastMessage.toastmessage('Please add your image.', true);
+          ToastMessage.toastMessage('Please add your image.', true);
           return false;
         } else {
           return true;

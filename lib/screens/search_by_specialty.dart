@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hospital/model/doctors.dart';
-import 'package:hospital/model/fieldsmodel.dart';
-import 'package:hospital/providers/hometabProviders.dart';
+import 'package:hospital/model/fields_model.dart';
+import 'package:hospital/providers/home_tab_providers.dart';
 import 'package:hospital/services/firebase/firebase_main_functions.dart';
 import 'package:hospital/services/size_config.dart';
 import 'package:hospital/theme.dart';
@@ -9,16 +9,16 @@ import 'package:hospital/widgets/sorted_doctors.dart';
 import 'package:hospital/widgets/top_doctors_card.dart';
 import 'package:provider/provider.dart';
 
-class SearchBySpecialityScreen extends StatelessWidget {
-  static const String routname = 'SearchBySpecialityScreen';
-  const SearchBySpecialityScreen({super.key});
+class SearchBySpecialtyScreen extends StatelessWidget {
+  static const String routName = 'SearchBySpecialtyScreen';
+  const SearchBySpecialtyScreen({super.key});
   @override
   Widget build(BuildContext context) {
     var homeTabProvider = Provider.of<HomeTabProviders>(context);
     var homeTabMethods = Provider.of<HomeTabProviders>(context, listen: false);
     return WillPopScope(
       onWillPop: () {
-        homeTabMethods.changeSpeciality('');
+        homeTabMethods.changeSpecialty('');
         homeTabMethods.resetFields();
         Navigator.pop(context);
         return Future.value(true);
@@ -31,13 +31,13 @@ class SearchBySpecialityScreen extends StatelessWidget {
               size: 25,
             ),
             onPressed: () {
-              homeTabMethods.changeSpeciality('');
+              homeTabMethods.changeSpecialty('');
               homeTabMethods.resetFields();
               Navigator.pop(context);
             },
           ),
           title: Text(
-            '${homeTabProvider.speciality}s',
+            '${homeTabProvider.specialty}s',
             style:
                 Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 20),
           ),
@@ -48,7 +48,7 @@ class SearchBySpecialityScreen extends StatelessWidget {
               child: CircleAvatar(
                   radius: 25,
                   backgroundImage:
-                      NetworkImage(homeTabProvider.userdata.imageurl)),
+                      NetworkImage(homeTabProvider.userData.imageUrl)),
             )
           ],
         ),
@@ -120,8 +120,8 @@ class SearchBySpecialityScreen extends StatelessWidget {
                     ),
                   );
                 },
-                future: FirebaseMainFunctions.getDoctorsBySpeciality(
-                    homeTabProvider.speciality),
+                future: FirebaseMainFunctions.getDoctorsBySpecialty(
+                    homeTabProvider.specialty),
               ),
             ],
           ),
@@ -145,12 +145,12 @@ class SearchBySpecialityScreen extends StatelessWidget {
         decoration: BoxDecoration(
             color: e.selected
                 ? Theme.of(context).primaryColor
-                : Themes.lighbackgroundColor,
+                : Themes.lightBackgroundColor,
             borderRadius: BorderRadius.circular(12)),
         child: InkWell(
           onTap: () {
             homeTabMethods.selectField(e);
-            homeTabMethods.changeSpeciality(e.name != 'Dentist'
+            homeTabMethods.changeSpecialty(e.name != 'Dentist'
                 ? '${e.name.substring(0, e.name.length - 1)}ist'
                 : e.name);
           },
@@ -183,7 +183,7 @@ class SearchBySpecialityScreen extends StatelessWidget {
                               ?.copyWith(
                                   color: e.selected
                                       ? Colors.white
-                                      : Themes.textcolor,
+                                      : Themes.textColor,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 11),
                         ),
